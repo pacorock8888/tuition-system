@@ -26,22 +26,12 @@
       top: 0;
       z-index: 100;
     }
-
-    .topbar h1 { font-size: 18px; font-weight: 700; }
+    .topbar h1  { font-size: 18px; font-weight: 700; }
     .topbar .sub { font-size: 12px; color: #8e8e93; margin-top: 2px; }
-
-    .year-tabs { display: flex; gap: 6px; }
-
+    .year-tabs  { display: flex; gap: 6px; }
     .year-tab {
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      background: #3a3a3c;
-      color: #ebebf5;
-      border: none;
-      transition: background 0.15s;
+      padding: 6px 14px; border-radius: 20px; font-size: 14px; font-weight: 600;
+      cursor: pointer; background: #3a3a3c; color: #ebebf5; border: none;
     }
     .year-tab.active { background: #007aff; color: white; }
 
@@ -52,194 +42,186 @@
       gap: 10px;
       padding: 16px 20px;
     }
-
-    .stat-card {
-      background: white;
-      border-radius: 14px;
-      padding: 16px;
-      text-align: center;
-    }
-
-    .stat-num {
-      font-size: 30px;
-      font-weight: 700;
-      line-height: 1;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: #8e8e93;
-      margin-top: 5px;
-    }
-
-    .stat-card.total .stat-num   { color: #1c1c1e; }
-    .stat-card.paid .stat-num    { color: #34c759; }
-    .stat-card.unpaid .stat-num  { color: #ff3b30; }
+    .stat-card { background: white; border-radius: 14px; padding: 14px; text-align: center; }
+    .stat-num  { font-size: 28px; font-weight: 700; line-height: 1; }
+    .stat-label { font-size: 13px; color: #8e8e93; margin-top: 5px; }
+    .stat-card.total   .stat-num { color: #1c1c1e; }
+    .stat-card.paid    .stat-num { color: #34c759; }
+    .stat-card.unpaid  .stat-num { color: #ff3b30; }
     .stat-card.expiring .stat-num { color: #ff9500; }
 
     /* ── 篩選列 ── */
     .filter-row {
       padding: 0 20px 14px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
     }
-
     .filter-row input {
-      flex: 1;
-      min-width: 180px;
-      padding: 10px 14px;
-      border: 1.5px solid #e5e5ea;
-      border-radius: 10px;
-      font-size: 15px;
-      font-family: inherit;
-      background: white;
+      flex: 1; min-width: 180px; padding: 9px 14px;
+      border: 1.5px solid #e5e5ea; border-radius: 10px;
+      font-size: 14px; font-family: inherit; background: white;
     }
     .filter-row input:focus { outline: none; border-color: #007aff; }
-
     .filter-btn {
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid #e5e5ea;
-      background: white;
-      color: #3a3a3c;
-      transition: all 0.15s;
+      padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #e5e5ea; background: white; color: #3a3a3c;
     }
     .filter-btn.active { background: #007aff; color: white; border-color: #007aff; }
 
-    /* ── 學生卡片：矩陣網格 ── */
-    .grid {
+    /* ── 磁磚網格 ── */
+    .tile-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
       padding: 0 20px 40px;
     }
+    .tile {
+      background: white; border-radius: 10px; padding: 12px 8px 10px;
+      text-align: center; cursor: pointer;
+      border-top: 3px solid #c7c7cc;
+      transition: transform 0.1s, box-shadow 0.1s;
+      user-select: none;
+    }
+    .tile:hover  { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+    .tile:active { transform: none; box-shadow: none; }
+    .tile.status-paid     { border-top-color: #34c759; }
+    .tile.status-unpaid   { border-top-color: #ff3b30; }
+    .tile.status-expiring { border-top-color: #ff9500; }
+    .tile.status-pending  { border-top-color: #c7c7cc; }
+    .tile.status-inactive { border-top-color: #e5e5ea; opacity: 0.5; }
+    .tile-name { font-size: 16px; font-weight: 700; }
+    .tile-tag  {
+      display: inline-block; margin-top: 6px;
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+    }
+    .tile-tag.paid     { background: #d1f5d9; color: #1a7a2e; }
+    .tile-tag.unpaid   { background: #ffe4e4; color: #c0392b; }
+    .tile-tag.expiring { background: #fff3d9; color: #b06000; }
+    .tile-tag.pending  { background: #f2f2f7; color: #6c6c70; }
+    .tile-tag.inactive { background: #f2f2f7; color: #8e8e93; }
 
-    .student-card {
-      background: white;
-      border-radius: 14px;
-      padding: 18px;
-      border-top: 4px solid transparent;
-      display: flex;
-      flex-direction: column;
-      gap: 0;
+    /* ── Loading ── */
+    .loading { text-align: center; padding: 60px 20px; color: #8e8e93; font-size: 15px; grid-column: 1/-1; }
+    #mainView { display: none; }
+
+    /* ── 詳細面板（右側抽屜）── */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.35); z-index: 200;
+    }
+    .overlay.show { display: block; }
+
+    .detail-panel {
+      position: fixed; top: 0; right: -420px; width: 420px; max-width: 100vw;
+      height: 100%; background: white;
+      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      z-index: 300; display: flex; flex-direction: column;
+      transition: right 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+    .detail-panel.open { right: 0; }
+
+    .panel-header {
+      padding: 16px 20px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+      border-bottom: 1px solid #f2f2f7; flex-shrink: 0;
+    }
+    .panel-name   { font-size: 22px; font-weight: 700; }
+    .panel-school { font-size: 14px; color: #6c6c70; margin-top: 3px; }
+    .panel-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 10px; }
+
+    .close-btn {
+      background: #f2f2f7; border: none; border-radius: 50%;
+      width: 30px; height: 30px; font-size: 14px; cursor: pointer;
     }
 
-    .student-card.status-paid     { border-top-color: #34c759; }
-    .student-card.status-unpaid   { border-top-color: #ff3b30; }
-    .student-card.status-expiring { border-top-color: #ff9500; }
-    .student-card.status-pending  { border-top-color: #c7c7cc; }
+    .panel-scroll { flex: 1; overflow-y: auto; padding: 0 20px 40px; }
 
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
+    .panel-section { padding: 16px 0; border-bottom: 1px solid #f2f2f7; }
+    .panel-section:last-child { border-bottom: none; }
+
+    .section-title {
+      font-size: 11px; font-weight: 700; color: #8e8e93;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px;
     }
 
-    .student-name {
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
+    .info-row { display: flex; gap: 8px; margin-bottom: 7px; font-size: 15px; align-items: flex-start; }
+    .info-icon { width: 22px; flex-shrink: 0; margin-top: 1px; }
+    .info-val  { line-height: 1.45; word-break: break-all; }
 
-    .student-meta {
-      font-size: 14px;
-      color: #6c6c70;
-      margin-top: 3px;
-    }
+    .period-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .period-lbl  { font-size: 14px; color: #6c6c70; }
+    .period-val  { font-size: 15px; font-weight: 600; }
 
     .status-badge {
-      font-size: 12px;
-      font-weight: 700;
-      padding: 4px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
-      flex-shrink: 0;
-      margin-left: 8px;
+      font-size: 12px; font-weight: 700; padding: 4px 10px;
+      border-radius: 20px; white-space: nowrap;
     }
-
     .badge-paid     { background: #d1f5d9; color: #1a7a2e; }
     .badge-unpaid   { background: #ffe4e4; color: #c0392b; }
     .badge-expiring { background: #fff3d9; color: #b06000; }
     .badge-pending  { background: #f2f2f7; color: #6c6c70; }
+    .badge-inactive { background: #f2f2f7; color: #8e8e93; }
 
-    .card-details {
-      font-size: 14px;
-      color: #4a4a4e;
-      line-height: 1.9;
-      border-top: 1px solid #f2f2f7;
-      padding-top: 10px;
-      margin-top: 2px;
-      flex: 1;
+    .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .panel-btn {
+      flex: 1; min-width: 80px; padding: 10px 6px;
+      border-radius: 10px; border: none; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: inherit; transition: opacity 0.15s;
     }
+    .panel-btn:hover   { opacity: 0.8; }
+    .panel-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-green { background: #34c759; color: white; }
+    .btn-blue  { background: #007aff; color: white; }
+    .btn-gray  { background: #f2f2f7; color: #3a3a3c; }
+    .btn-red   { background: #ff3b30; color: white; }
 
-    .card-details .row {
-      display: flex;
-      gap: 6px;
+    .sub-form {
+      margin-top: 14px; background: #f8f8f8;
+      border-radius: 12px; padding: 14px;
     }
+    .sub-form.hidden { display: none; }
 
-    .card-details .icon {
-      flex-shrink: 0;
-      width: 20px;
+    .form-field { margin-bottom: 12px; }
+    .form-field label { display: block; font-size: 12px; font-weight: 600; color: #6c6c70; margin-bottom: 5px; }
+    .form-field input,
+    .form-field select {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid #e5e5ea; border-radius: 8px;
+      font-size: 14px; font-family: inherit; background: white;
+      -webkit-appearance: none; appearance: none;
     }
+    .form-field input:focus,
+    .form-field select:focus { outline: none; border-color: #007aff; }
 
-    .card-details .val {
-      color: #1c1c1e;
-      word-break: break-all;
+    .save-btn {
+      width: 100%; padding: 11px; background: #007aff; color: white;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 700;
+      cursor: pointer; margin-top: 4px; font-family: inherit;
     }
+    .save-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .card-actions {
-      display: flex;
-      gap: 8px;
-      margin-top: 14px;
+    .hist-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid #f2f2f7; font-size: 14px;
     }
+    .hist-row:last-child { border-bottom: none; }
+    .hist-date   { color: #3a3a3c; font-weight: 600; }
+    .hist-plan   { color: #6c6c70; font-size: 13px; }
+    .hist-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
 
-    .action-btn {
-      flex: 1;
-      padding: 10px 6px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      transition: opacity 0.15s;
-      font-family: inherit;
-      text-align: center;
-    }
-    .action-btn:hover { opacity: 0.8; }
-    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-paid   { background: #34c759; color: white; }
-    .btn-unpaid { background: #ff3b30; color: white; }
-    .btn-phone  { background: #f2f2f7; color: #1c1c1e; }
-
-    /* ── Loading ── */
-    .loading {
-      text-align: center;
-      padding: 60px 20px;
-      color: #8e8e93;
-      font-size: 16px;
-      grid-column: 1 / -1;
-    }
-
-    #mainView { display: none; }
-
+    /* ── RWD ── */
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .stat-num  { font-size: 24px; }
-      .grid      { grid-template-columns: 1fr; padding: 0 12px 40px; }
+      .tile-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); padding: 0 12px 40px; }
+      .detail-panel { width: 100%; right: auto; bottom: -90vh; top: auto; height: 90vh; border-radius: 20px 20px 0 0; transition: bottom 0.28s cubic-bezier(0.4,0,0.2,1); }
+      .detail-panel.open { bottom: 0; }
     }
   </style>
 </head>
 <body>
 
 <div id="mainView">
-
   <div class="topbar">
     <div>
       <div class="sub">巨石玩理管理後台</div>
@@ -268,56 +250,176 @@
   </div>
 
   <div class="filter-row">
-    <input type="text" id="searchInput" placeholder="搜尋姓名、學校、地址…" oninput="renderList()">
+    <input type="text" id="searchInput" placeholder="搜尋姓名、學校…" oninput="renderGrid()">
     <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
     <button class="filter-btn"       onclick="setFilter('unpaid',this)">未繳</button>
     <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
     <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
+    <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
   </div>
 
-  <div class="grid" id="studentList">
+  <div class="tile-grid" id="tileGrid">
     <div class="loading">載入中…</div>
   </div>
+</div>
 
+<!-- 詳細面板 -->
+<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+
+<div class="detail-panel" id="detailPanel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-name" id="pName"></div>
+      <div class="panel-school" id="pSchool"></div>
+    </div>
+    <div class="panel-header-right">
+      <span class="status-badge" id="pBadge"></span>
+      <button class="close-btn" onclick="closeDetail()">✕</button>
+    </div>
+  </div>
+
+  <div class="panel-scroll">
+
+    <!-- 聯絡資料 -->
+    <div class="panel-section">
+      <div class="section-title">聯絡資料</div>
+      <div class="info-row"><span class="info-icon">📱</span><span class="info-val" id="pPhone"></span></div>
+      <div class="info-row"><span class="info-icon">🏠</span><span class="info-val" id="pAddress"></span></div>
+      <div class="info-row"><span class="info-icon">💬</span><span class="info-val" id="pLine"></span></div>
+    </div>
+
+    <!-- 本期資料 -->
+    <div class="panel-section">
+      <div class="section-title">本期資料</div>
+      <div class="period-item">
+        <span class="period-lbl">課程方案</span>
+        <span class="period-val" id="pPlan"></span>
+      </div>
+      <div class="period-item">
+        <span class="period-lbl">課程期間</span>
+        <span class="period-val" id="pDateRange"></span>
+      </div>
+    </div>
+
+    <!-- 操作 -->
+    <div class="panel-section">
+      <div class="section-title">操作</div>
+      <div class="action-row">
+        <button class="panel-btn btn-green" id="btnPay"    onclick="toggleForm('payForm')">✅ 記錄繳費</button>
+        <button class="panel-btn btn-blue"  id="btnRenew"  onclick="toggleForm('renewForm')">🔄 更新學期</button>
+        <button class="panel-btn btn-gray"  id="btnInact"  onclick="doMarkInactive()">🚫 不續班</button>
+      </div>
+
+      <!-- 記錄繳費表單 -->
+      <div id="payForm" class="sub-form hidden">
+        <div class="form-field">
+          <label>繳費日期</label>
+          <input type="date" id="payDate">
+        </div>
+        <div class="form-field">
+          <label>金額（元）</label>
+          <input type="number" id="payAmount" placeholder="例：9000">
+        </div>
+        <button class="save-btn" id="paySubmit" onclick="doRecordPayment()">確認已繳費</button>
+      </div>
+
+      <!-- 更新學期表單 -->
+      <div id="renewForm" class="sub-form hidden">
+        <div class="form-field">
+          <label>課程方案</label>
+          <select id="renewPlan" onchange="onPlanChange()">
+            <option value="四個月9000">四個月｜$9,000</option>
+            <option value="四個月9500">四個月｜$9,500</option>
+            <option value="四個月10000">四個月｜$10,000</option>
+            <option value="六個月13500">六個月｜$13,500</option>
+            <option value="六個月14400">六個月｜$14,400</option>
+            <option value="custom">自訂</option>
+          </select>
+        </div>
+        <div class="form-field" id="customPlanRow" style="display:none">
+          <label>自訂方案名稱</label>
+          <input type="text" id="customPlan" placeholder="例：三個月8000">
+        </div>
+        <div class="form-field">
+          <label>開始月份</label>
+          <input type="month" id="renewStart" oninput="calcRenewEnd()">
+        </div>
+        <div class="form-field">
+          <label>結束月份</label>
+          <input type="month" id="renewEnd">
+        </div>
+        <button class="save-btn" id="renewSubmit" onclick="doUpdatePeriod()">儲存學期</button>
+      </div>
+    </div>
+
+    <!-- 繳費紀錄 -->
+    <div class="panel-section">
+      <div class="section-title">繳費紀錄</div>
+      <div id="payHistory"><div style="color:#8e8e93;font-size:13px">載入中…</div></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh7gL_upYsyoKjvEGywwqMLHOig7N3puMIrVM15TonXg_LpR9fcsfwQrBSBCGU60Ju/exec';
 
-  let allStudents   = [];
-  let currentYear   = '';
-  let currentFilter = 'all';
-  const adminToken  = 'paco2024';
+  let allStudents      = [];
+  let currentYear      = '';
+  let currentFilter    = 'all';
+  let currentStudentId = null;
+  const adminToken     = 'paco2024';
 
-  // ── 日期格式化（ISO → YYYY/MM）──
-  function fmtDate(val) {
+  // ── 日期格式化 ──
+  function fmtYM(val) {
     if (!val) return '—';
     const d = new Date(val);
-    if (isNaN(d)) return val;
+    if (isNaN(d)) return String(val).slice(0, 7);
     return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0');
   }
 
+  function fmtFull(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return String(val);
+    return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+  }
+
+  // ── 繳費狀態 ──
+  function getStatus(s) {
+    const raw = s['繳費狀態'] || '待確認';
+    if (raw === '不續班') return 'inactive';
+    if (raw === '已繳' || raw === '已繳費') return 'paid';
+    if (raw === '未繳' || raw === '到期未繳') return 'unpaid';
+    const end = s['課程截止'];
+    if (end) {
+      const d = new Date(end);
+      if (!isNaN(d)) {
+        const diffDays = (d - new Date()) / 86400000;
+        if (diffDays >= 0 && diffDays <= 30) return 'expiring';
+      }
+    }
+    return 'pending';
+  }
+
+  const STATUS_LABEL = { paid: '已繳費', unpaid: '未繳費', expiring: '即將到期', pending: '待確認', inactive: '不續班' };
+  const STATUS_BADGE = { paid: 'badge-paid', unpaid: 'badge-unpaid', expiring: 'badge-expiring', pending: 'badge-pending', inactive: 'badge-inactive' };
+
   // ── 載入資料 ──
   async function loadStudents() {
-    const list = document.getElementById('studentList');
-    list.innerHTML = '<div class="loading">載入中，請稍候…</div>';
     try {
       const res  = await fetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
       const json = await res.json();
-      if (json.status === 'error') {
-        list.innerHTML = `<div class="loading" style="color:#ff3b30">載入失敗：${json.message}</div>`;
-        return;
-      }
+      if (json.status !== 'success') throw new Error(json.message);
       allStudents = json.data;
       document.getElementById('mainView').style.display = 'block';
       initYearTabs();
-      renderList();
+      renderGrid();
     } catch (err) {
-      list.innerHTML = `<div class="loading" style="color:#ff3b30">連線失敗，請稍後重試。<br><br>${err}</div>`;
+      document.getElementById('tileGrid').innerHTML = `<div class="loading" style="color:#ff3b30">連線失敗，請稍後重試。<br><br>${err}</div>`;
       document.getElementById('mainView').style.display = 'block';
     }
   }
-
   window.addEventListener('load', loadStudents);
 
   // ── 年度分頁 ──
@@ -335,127 +437,265 @@
         currentYear = year;
         document.querySelectorAll('.year-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        renderList();
+        renderGrid();
       };
       container.appendChild(btn);
     });
   }
 
   // ── 篩選 ──
-  function setFilter(filter, btn) {
-    currentFilter = filter;
+  function setFilter(f, btn) {
+    currentFilter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    renderList();
+    renderGrid();
   }
 
-  // ── 繳費狀態 ──
-  function getDisplayStatus(s) {
-    const raw = s['繳費狀態'] || '待確認';
-    const end = s['課程截止'] || '';
-    let expiringSoon = false;
-    if (end) {
-      const endDate  = new Date(end);
-      const diffDays = (endDate - new Date()) / 86400000;
-      if (diffDays >= 0 && diffDays <= 30) expiringSoon = true;
-    }
-    if (raw === '已繳' || raw === '已繳費') return 'paid';
-    if (expiringSoon) return 'expiring';
-    if (raw === '未繳' || raw === '到期未繳') return 'unpaid';
-    return 'pending';
-  }
-
-  // ── 渲染 ──
-  function renderList() {
+  // ── 渲染磁磚 ──
+  function renderGrid() {
     const keyword  = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allStudents.filter(s => {
-      if (s['學費年度'] !== currentYear) return false;
+    const year     = allStudents.filter(s => s['學費年度'] === currentYear);
+    const filtered = year.filter(s => {
       if (keyword) {
-        const hay = (s['學生姓名'] + s['就讀學校'] + s['家長電話'] + (s['地址'] || '')).toLowerCase();
+        const hay = (s['學生姓名'] + s['就讀學校'] + (s['地址'] || '')).toLowerCase();
         if (!hay.includes(keyword)) return false;
       }
-      const st = getDisplayStatus(s);
+      const st = getStatus(s);
       return currentFilter === 'all' || st === currentFilter;
     });
 
-    const yearStudents = allStudents.filter(s => s['學費年度'] === currentYear);
+    // 統計（不含不續班）
     let paid = 0, unpaid = 0, expiring = 0;
-    yearStudents.forEach(s => {
-      const st = getDisplayStatus(s);
+    year.forEach(s => {
+      const st = getStatus(s);
       if (st === 'paid')     paid++;
       if (st === 'unpaid')   unpaid++;
       if (st === 'expiring') expiring++;
     });
-    document.getElementById('statTotal').textContent    = yearStudents.length;
+    document.getElementById('statTotal').textContent    = year.filter(s => getStatus(s) !== 'inactive').length;
     document.getElementById('statPaid').textContent     = paid;
     document.getElementById('statUnpaid').textContent   = unpaid;
     document.getElementById('statExpiring').textContent = expiring;
 
-    const container = document.getElementById('studentList');
-    container.innerHTML = '';
+    const grid = document.getElementById('tileGrid');
+    grid.innerHTML = '';
 
     if (!filtered.length) {
-      container.innerHTML = '<div class="loading">沒有符合條件的學生</div>';
+      grid.innerHTML = '<div class="loading">沒有符合條件的學生</div>';
       return;
     }
 
-    const labels = { paid: '已繳費', unpaid: '未繳費', expiring: '即將到期', pending: '待確認' };
-    const badges = { paid: 'badge-paid', unpaid: 'badge-unpaid', expiring: 'badge-expiring', pending: 'badge-pending' };
-
     filtered.forEach(s => {
-      const st   = getDisplayStatus(s);
-      const card = document.createElement('div');
-      card.className = `student-card status-${st}`;
-      card.dataset.id = s['id'];
-      card.innerHTML = `
-        <div class="card-top">
-          <div>
-            <div class="student-name">${s['學生姓名']}</div>
-            <div class="student-meta">${s['就讀學校']}${s['年級'] ? '　' + s['年級'] : ''}</div>
-          </div>
-          <span class="status-badge ${badges[st]}">${labels[st]}</span>
-        </div>
-        <div class="card-details">
-          <div class="row"><span class="icon">📱</span><span class="val">${s['家長電話'] || '—'}</span></div>
-          <div class="row"><span class="icon">🏠</span><span class="val">${s['地址'] || '—'}</span></div>
-          <div class="row"><span class="icon">💰</span><span class="val">${s['課程方案'] || '—'}</span></div>
-          <div class="row"><span class="icon">📅</span><span class="val">${fmtDate(s['課程開始'])} ～ ${fmtDate(s['課程截止'])}</span></div>
-        </div>
-        <div class="card-actions">
-          <button class="action-btn btn-paid"   onclick="markPaid(${s['id']}, this)">✅ 已繳</button>
-          <button class="action-btn btn-unpaid" onclick="markUnpaid(${s['id']}, this)">❌ 未繳</button>
-          <button class="action-btn btn-phone"  onclick="callPhone('${s['家長電話']}')">📞 聯絡</button>
-        </div>
+      const st   = getStatus(s);
+      const tile = document.createElement('div');
+      tile.className = `tile status-${st}`;
+      tile.onclick   = () => openDetail(s['id']);
+      tile.innerHTML = `
+        <div class="tile-name">${s['學生姓名']}</div>
+        <div class="tile-tag ${st}">${STATUS_LABEL[st]}</div>
       `;
-      container.appendChild(card);
+      grid.appendChild(tile);
     });
   }
 
-  async function markPaid(id, btn)   { await updateStatus(id, '已繳', btn); }
-  async function markUnpaid(id, btn) { await updateStatus(id, '未繳', btn); }
+  // ── 開啟詳細面板 ──
+  async function openDetail(id) {
+    const s = allStudents.find(s => s['id'] === id);
+    if (!s) return;
+    currentStudentId = id;
 
-  async function updateStatus(id, status, btn) {
-    btn.disabled = true;
-    btn.textContent = '更新中…';
-    try {
-      const url  = `${SCRIPT_URL}?action=updatePayment&token=${adminToken}&student_id=${id}&payment_status=${encodeURIComponent(status)}`;
-      const res  = await fetch(url);
-      const json = await res.json();
-      if (json.status === 'success') {
-        const s = allStudents.find(s => s['id'] === id);
-        if (s) s['繳費狀態'] = status;
-        renderList();
+    const st = getStatus(s);
+    document.getElementById('pName').textContent      = s['學生姓名'];
+    document.getElementById('pSchool').textContent    = `${s['就讀學校']}${s['年級'] ? ' · ' + s['年級'] : ''}`;
+    document.getElementById('pPhone').textContent     = s['家長電話'] || '—';
+    document.getElementById('pAddress').textContent   = s['地址'] || '—';
+    document.getElementById('pLine').textContent      = s['LINE ID'] || '—';
+    document.getElementById('pPlan').textContent      = s['課程方案'] || '—';
+    document.getElementById('pDateRange').textContent = `${fmtYM(s['課程開始'])} ～ ${fmtYM(s['課程截止'])}`;
+
+    const badge = document.getElementById('pBadge');
+    badge.textContent = STATUS_LABEL[st];
+    badge.className   = `status-badge ${STATUS_BADGE[st]}`;
+
+    // 預填表單
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('payDate').value   = today;
+    document.getElementById('payAmount').value = s['月費金額'] || '';
+
+    // 預填更新學期（下一個月開始）
+    const endVal = s['課程截止'];
+    if (endVal) {
+      const endD = new Date(endVal);
+      if (!isNaN(endD)) {
+        endD.setMonth(endD.getMonth() + 1);
+        document.getElementById('renewStart').value = endD.getFullYear() + '-' + String(endD.getMonth() + 1).padStart(2, '0');
       }
-    } catch {
-      btn.disabled = false;
-      btn.textContent = '失敗，重試';
+    }
+    // 比對方案
+    const plan = s['課程方案'] || '';
+    const planSelect = document.getElementById('renewPlan');
+    let matched = false;
+    for (let opt of planSelect.options) {
+      if (opt.value === plan) { planSelect.value = plan; matched = true; break; }
+    }
+    if (!matched) {
+      planSelect.value = 'custom';
+      document.getElementById('customPlan').value = plan;
+      document.getElementById('customPlanRow').style.display = 'block';
+    } else {
+      document.getElementById('customPlanRow').style.display = 'none';
+    }
+    calcRenewEnd();
+
+    // 隱藏子表單
+    document.getElementById('payForm').classList.add('hidden');
+    document.getElementById('renewForm').classList.add('hidden');
+
+    // 開啟面板
+    document.getElementById('detailPanel').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+
+    // 載入繳費紀錄
+    loadHistory(id);
+  }
+
+  function closeDetail() {
+    document.getElementById('detailPanel').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+    currentStudentId = null;
+  }
+
+  // ── 切換子表單 ──
+  function toggleForm(formId) {
+    const others = ['payForm', 'renewForm'].filter(f => f !== formId);
+    others.forEach(f => document.getElementById(f).classList.add('hidden'));
+    document.getElementById(formId).classList.toggle('hidden');
+  }
+
+  // ── 課程方案切換 ──
+  function onPlanChange() {
+    const v = document.getElementById('renewPlan').value;
+    document.getElementById('customPlanRow').style.display = v === 'custom' ? 'block' : 'none';
+    calcRenewEnd();
+  }
+
+  function calcRenewEnd() {
+    const plan  = document.getElementById('renewPlan').value;
+    const start = document.getElementById('renewStart').value;
+    if (!start) return;
+    const months = plan.startsWith('四個月') ? 4 : plan.startsWith('六個月') ? 6 : 0;
+    if (months > 0) {
+      const [y, m] = start.split('-').map(Number);
+      const end = new Date(y, m - 1 + months, 1);
+      document.getElementById('renewEnd').value = end.getFullYear() + '-' + String(end.getMonth() + 1).padStart(2, '0');
     }
   }
 
-  function callPhone(phone) {
-    window.location.href = 'tel:' + phone.replace(/[^0-9]/g, '');
+  // ── API 呼叫 ──
+  async function apiGet(params) {
+    const qs  = Object.entries({ token: adminToken, ...params }).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
+    const res  = await fetch(`${SCRIPT_URL}?${qs}`);
+    return res.json();
+  }
+
+  // ── 記錄繳費 ──
+  async function doRecordPayment() {
+    const date   = document.getElementById('payDate').value;
+    const amount = document.getElementById('payAmount').value;
+    if (!date) return alert('請填入繳費日期');
+
+    const btn = document.getElementById('paySubmit');
+    btn.disabled = true; btn.textContent = '儲存中…';
+
+    const json = await apiGet({ action: 'recordPayment', student_id: currentStudentId, payment_date: date, amount });
+    if (json.status === 'success') {
+      const s = allStudents.find(s => s['id'] === currentStudentId);
+      if (s) s['繳費狀態'] = '已繳';
+      renderGrid();
+      document.getElementById('pBadge').textContent  = '已繳費';
+      document.getElementById('pBadge').className    = 'status-badge badge-paid';
+      document.getElementById('payForm').classList.add('hidden');
+      loadHistory(currentStudentId);
+    } else {
+      alert('儲存失敗：' + (json.message || '請重試'));
+    }
+    btn.disabled = false; btn.textContent = '確認已繳費';
+  }
+
+  // ── 更新學期 ──
+  async function doUpdatePeriod() {
+    const planSel = document.getElementById('renewPlan').value;
+    const plan    = planSel === 'custom' ? document.getElementById('customPlan').value.trim() : planSel;
+    const start   = document.getElementById('renewStart').value;
+    const end     = document.getElementById('renewEnd').value;
+    if (!plan || !start || !end) return alert('請填入完整資料');
+
+    const btn = document.getElementById('renewSubmit');
+    btn.disabled = true; btn.textContent = '儲存中…';
+
+    const json = await apiGet({ action: 'updatePeriod', student_id: currentStudentId, course_plan: plan, start_date: start, end_date: end });
+    if (json.status === 'success') {
+      const s = allStudents.find(s => s['id'] === currentStudentId);
+      if (s) { s['課程方案'] = plan; s['課程開始'] = start; s['課程截止'] = end; s['繳費狀態'] = '待確認'; }
+      document.getElementById('pPlan').textContent      = plan;
+      document.getElementById('pDateRange').textContent = `${fmtYM(start)} ～ ${fmtYM(end)}`;
+      document.getElementById('pBadge').textContent     = '待確認';
+      document.getElementById('pBadge').className       = 'status-badge badge-pending';
+      renderGrid();
+      document.getElementById('renewForm').classList.add('hidden');
+    } else {
+      alert('儲存失敗：' + (json.message || '請重試'));
+    }
+    btn.disabled = false; btn.textContent = '儲存學期';
+  }
+
+  // ── 標記不續班 ──
+  async function doMarkInactive() {
+    const s = allStudents.find(s => s['id'] === currentStudentId);
+    const name = s ? s['學生姓名'] : '此學生';
+    if (!confirm(`確定將 ${name} 標記為不續班？`)) return;
+
+    const json = await apiGet({ action: 'markInactive', student_id: currentStudentId });
+    if (json.status === 'success') {
+      const s = allStudents.find(s => s['id'] === currentStudentId);
+      if (s) s['繳費狀態'] = '不續班';
+      renderGrid();
+      closeDetail();
+    } else {
+      alert('操作失敗：' + (json.message || '請重試'));
+    }
+  }
+
+  // ── 載入繳費紀錄 ──
+  async function loadHistory(id) {
+    const div = document.getElementById('payHistory');
+    div.innerHTML = '<div style="color:#8e8e93;font-size:13px">載入中…</div>';
+    try {
+      const json = await apiGet({ action: 'getStudentHistory', student_id: id });
+      if (json.status !== 'success') throw new Error(json.message);
+      if (!json.data.length) {
+        div.innerHTML = '<div style="color:#8e8e93;font-size:13px;padding:4px 0">尚無繳費紀錄</div>';
+        return;
+      }
+      div.innerHTML = json.data.map(h => {
+        const statusColor = h['狀態'] === '已繳' ? 'badge-paid' : 'badge-pending';
+        return `
+          <div class="hist-row">
+            <div>
+              <div class="hist-date">${h['繳費月份'] || '—'}</div>
+              <div class="hist-plan">${h['學費年度'] ? h['學費年度'] + '年度' : ''}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600">${h['金額'] ? '$' + Number(h['金額']).toLocaleString() : '—'}</div>
+              <span class="hist-status ${statusColor}">${h['狀態']}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (e) {
+      div.innerHTML = '<div style="color:#8e8e93;font-size:13px">需更新後台才能顯示紀錄</div>';
+    }
   }
 </script>
-
 </body>
 </html>
