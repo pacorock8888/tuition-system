@@ -571,8 +571,12 @@
     if (/^\d{4}-\d{2}$/.test(s)) {
       [y, m] = s.split('-').map(Number);
     } else if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-      // ISO date string：只取 YYYY-MM 部分
-      [y, m] = s.substring(0, 7).split('-').map(Number);
+      // Sheets 序列化後含時區偏移（如 2026-05-31T16:00:00.000Z 代表台灣 2026-06）
+      // 用 new Date() 解析再取本地年月，才能正確還原台灣時區
+      const d = new Date(s);
+      if (isNaN(d)) return null;
+      y = d.getFullYear();
+      m = d.getMonth() + 1; // getMonth() 0-indexed → +1 得到 1–12
     } else {
       return null;
     }
