@@ -739,11 +739,11 @@
   }
 
   function calcScholarshipAmount(cur, prev) {
-    let total = 0;
-    if (cur === 100) total += 500;
-    else if (cur >= 90) total += 300;
-    if (prev !== null && !isNaN(prev) && (cur - prev) >= 20) total += 200;
-    return total;
+    const candidates = [];
+    if (cur === 100) candidates.push(500);
+    if (cur >= 90)   candidates.push(300);
+    if (prev !== null && !isNaN(prev) && (cur - prev) >= 20) candidates.push(200);
+    return candidates.length > 0 ? Math.max(...candidates) : 0;
   }
 
   // ── 新增成績 ──
