@@ -209,62 +209,6 @@
       font-size: 15px;
     }
 
-    /* ── 登入頁 ── */
-    #loginView {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .login-card {
-      background: white;
-      border-radius: 16px;
-      padding: 36px 28px;
-      width: 100%;
-      max-width: 360px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-      text-align: center;
-    }
-
-    .login-card h2 { font-size: 20px; margin-bottom: 6px; }
-    .login-card p  { font-size: 13px; color: #8e8e93; margin-bottom: 24px; }
-
-    .login-card input {
-      width: 100%;
-      padding: 12px 14px;
-      border: 1.5px solid #e5e5ea;
-      border-radius: 10px;
-      font-size: 15px;
-      margin-bottom: 12px;
-      font-family: inherit;
-      text-align: center;
-      letter-spacing: 0.1em;
-    }
-
-    .login-card input:focus { outline: none; border-color: #007aff; }
-
-    .login-btn {
-      width: 100%;
-      padding: 14px;
-      background: #007aff;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-    }
-
-    .login-error {
-      color: #ff3b30;
-      font-size: 13px;
-      margin-top: 10px;
-      display: none;
-    }
-
     #mainView { display: none; }
 
     /* ── 手機版調整 ── */
@@ -275,17 +219,6 @@
   </style>
 </head>
 <body>
-
-<!-- ── 登入頁面 ── -->
-<div id="loginView">
-  <div class="login-card">
-    <h2>巨石玩理</h2>
-    <p>學費管理後台</p>
-    <input type="password" id="tokenInput" placeholder="請輸入密碼" autocomplete="off">
-    <button class="login-btn" onclick="login()">進入</button>
-    <div class="login-error" id="loginError">密碼錯誤，請重試。</div>
-  </div>
-</div>
 
 <!-- ── 主介面 ── -->
 <div id="mainView">
@@ -338,42 +271,35 @@
   let allStudents   = [];
   let currentYear   = '';
   let currentFilter = 'all';
-  let adminToken    = '';
-
-  // ── 登入 ──
-  function login() {
-    adminToken = document.getElementById('tokenInput').value.trim();
-    if (!adminToken) return;
-    loadStudents();
-  }
-
-  document.getElementById('tokenInput').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') login();
-  });
+  const adminToken  = 'paco2024';
 
   // ── 載入資料 ──
   async function loadStudents() {
+    const list = document.getElementById('studentList');
+    list.innerHTML = '<div class="loading">載入中，請稍候…</div>';
+
     try {
       const res  = await fetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
       const json = await res.json();
 
       if (json.status === 'error') {
-        document.getElementById('loginError').style.display = 'block';
+        list.innerHTML = '<div class="loading" style="color:#ff3b30">載入失敗：' + json.message + '</div>';
         return;
       }
 
       allStudents = json.data;
-      document.getElementById('loginView').style.display = 'none';
-      document.getElementById('mainView').style.display  = 'block';
-
+      document.getElementById('mainView').style.display = 'block';
       initYearTabs();
       renderList();
 
     } catch (err) {
-      document.getElementById('loginError').textContent = '連線失敗，請確認網路。';
-      document.getElementById('loginError').style.display = 'block';
+      list.innerHTML = '<div class="loading" style="color:#ff3b30">連線失敗，請確認 Apps Script 已部署為「所有人」可存取。<br><br>' + err.toString() + '</div>';
+      document.getElementById('mainView').style.display = 'block';
     }
   }
+
+  // 頁面載入時自動執行
+  window.addEventListener('load', loadStudents);
 
   // ── 學費年度分頁 ──
   function initYearTabs() {
