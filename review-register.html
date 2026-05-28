@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>巨石玩理 ｜ 暑假複習班報名</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', 'PingFang TC', sans-serif;
+      background: #f2f2f7; color: #1c1c1e; min-height: 100vh;
+      padding: 32px 16px 48px;
+    }
+
+    .container { max-width: 560px; margin: 0 auto; }
+
+    header { text-align: center; margin-bottom: 28px; }
+    header .brand { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; color: #8e8e93; text-transform: uppercase; margin-bottom: 6px; }
+    header h1 { font-size: 24px; font-weight: 700; }
+    header p  { font-size: 14px; color: #6c6c70; margin-top: 8px; line-height: 1.6; }
+
+    .card { background: white; border-radius: 16px; padding: 28px 24px; box-shadow: 0 1px 8px rgba(0,0,0,0.06), 0 4px 20px rgba(0,0,0,0.04); }
+
+    .section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #8e8e93; margin: 24px 0 16px; }
+    .section-title:first-child { margin-top: 0; }
+
+    .field { margin-bottom: 16px; }
+    label  { display: block; font-size: 13px; font-weight: 600; color: #3a3a3c; margin-bottom: 6px; }
+    label .req { color: #ff3b30; margin-left: 2px; }
+
+    input[type="text"], input[type="tel"], select, textarea {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #e5e5ea; border-radius: 10px;
+      font-size: 15px; font-family: inherit; color: #1c1c1e; background: #fff;
+      transition: border-color 0.15s; -webkit-appearance: none; appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #007aff; }
+    input::placeholder, textarea::placeholder { color: #c7c7cc; }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+    .hint { font-size: 12px; color: #8e8e93; margin-top: 4px; }
+    .divider { height: 1px; background: #f2f2f7; margin: 20px 0; }
+
+    /* 班別選擇卡片 */
+    .class-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .class-option  {
+      border: 2px solid #e5e5ea; border-radius: 12px; padding: 14px;
+      cursor: pointer; transition: all 0.15s; position: relative;
+    }
+    .class-option input[type="checkbox"] { display: none; }
+    .class-option.checked-bio { border-color: #34c759; background: #f0fff4; }
+    .class-option.checked-phy { border-color: #007aff; background: #f0f6ff; }
+    .class-option .class-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .class-option .class-fee  { font-size: 13px; color: #8e8e93; }
+    .class-option .class-fee strong { color: #1c1c1e; }
+    .class-option .check-mark { position: absolute; top: 10px; right: 10px; font-size: 16px; display: none; }
+    .class-option.checked-bio .check-mark,
+    .class-option.checked-phy .check-mark { display: block; }
+
+    /* 費用顯示 */
+    .fee-summary {
+      background: #f8f8f8; border-radius: 12px; padding: 14px 16px; margin-top: 12px;
+      display: none;
+    }
+    .fee-summary.show { display: block; }
+    .fee-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+    .fee-row:last-child { margin-bottom: 0; font-weight: 700; font-size: 16px; border-top: 1px solid #e5e5ea; padding-top: 8px; margin-top: 6px; }
+    .fee-total { color: #007aff; }
+
+    /* 身份選擇 */
+    .radio-group { display: flex; gap: 10px; }
+    .radio-opt {
+      flex: 1; border: 2px solid #e5e5ea; border-radius: 10px; padding: 12px;
+      cursor: pointer; text-align: center; font-size: 14px; font-weight: 600;
+      transition: all 0.15s;
+    }
+    .radio-opt input { display: none; }
+    .radio-opt.selected { border-color: #007aff; background: #f0f6ff; color: #007aff; }
+
+    .submit-btn {
+      width: 100%; padding: 15px; background: #007aff; color: white;
+      border: none; border-radius: 12px; font-size: 16px; font-weight: 600;
+      cursor: pointer; margin-top: 12px; transition: opacity 0.15s; font-family: inherit;
+    }
+    .submit-btn:hover { opacity: 0.85; }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .error-banner {
+      display: none; background: #fff1f0; border: 1px solid #ffccc7;
+      border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #cf1322; margin-top: 12px;
+    }
+
+    .success-view { display: none; text-align: center; padding: 40px 24px; }
+    .success-icon { font-size: 56px; line-height: 1; margin-bottom: 16px; }
+    .success-view h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .success-view p  { font-size: 14px; color: #6c6c70; line-height: 1.7; }
+
+    footer { text-align: center; margin-top: 20px; font-size: 12px; color: #c7c7cc; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="brand">巨石玩理</div>
+    <h1>暑假複習班報名</h1>
+    <p>填寫完成後，PACO 老師會透過 LINE 與您聯繫，確認課程安排與繳費方式。</p>
+  </header>
+
+  <div class="card">
+    <form id="regForm">
+
+      <div class="section-title">學生資料</div>
+
+      <div class="field">
+        <label>學生姓名 <span class="req">*</span></label>
+        <input type="text" name="student_name" placeholder="請填寫學生本名" required>
+      </div>
+      <div class="field">
+        <label>就讀學校 <span class="req">*</span></label>
+        <input type="text" name="school" placeholder="例：○○國中" required>
+      </div>
+      <div class="field">
+        <label>就讀年級 <span class="req">*</span></label>
+        <select name="grade" required>
+          <option value="">請選擇</option>
+          <option value="七年級（國一）">七年級（國一）</option>
+          <option value="八年級（國二）">八年級（國二）</option>
+          <option value="九年級（國三）">九年級（國三）</option>
+        </select>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">聯絡資料</div>
+
+      <div class="field">
+        <label>家長聯絡方式（電話 / LINE ID）<span class="req">*</span></label>
+        <input type="text" name="contact" placeholder="電話號碼或 LINE ID" required>
+        <div class="hint">填其中一個即可，或兩個都填（例：0912-345-678 / lineID）</div>
+      </div>
+      <div class="field">
+        <label>居住地址 <span class="req">*</span></label>
+        <input type="text" name="address" placeholder="縣市區里路號" required>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">是否為進度班學生</div>
+
+      <div class="field">
+        <div class="hint" style="margin-bottom:10px">目前有在上週六進度班的學生，學費享有班內生優惠。</div>
+        <div class="radio-group">
+          <label class="radio-opt" id="memberYes" onclick="selectMember('是')">
+            <input type="radio" name="is_member" value="是">
+            ✅ 班內生<br><span style="font-size:12px;font-weight:400;color:#8e8e93">有上進度班</span>
+          </label>
+          <label class="radio-opt" id="memberNo" onclick="selectMember('否')">
+            <input type="radio" name="is_member" value="否">
+            🆕 班外生<br><span style="font-size:12px;font-weight:400;color:#8e8e93">只上複習班</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">報名班別 <span class="req">*</span></div>
+
+      <div class="field">
+        <div class="hint" style="margin-bottom:10px">可同時報名兩科，費用分開計算。</div>
+        <div class="class-options">
+          <label class="class-option" id="optBio" onclick="toggleClass('bio')">
+            <input type="checkbox" id="cbBio" name="bio_class" value="on">
+            <div class="class-name">🌿 生物複習班</div>
+            <div class="class-fee">班內生 <strong>$2,500</strong></div>
+            <div class="class-fee">班外生 <strong>$3,900</strong></div>
+            <div class="class-fee" style="margin-top:4px;color:#8e8e93;font-size:11px">週日 · 7–8月</div>
+            <span class="check-mark">✓</span>
+          </label>
+          <label class="class-option" id="optPhy" onclick="toggleClass('phy')">
+            <input type="checkbox" id="cbPhy" name="phy_class" value="on">
+            <div class="class-name">⚗️ 理化複習班</div>
+            <div class="class-fee">班內生 <strong>$2,500</strong></div>
+            <div class="class-fee">班外生 <strong>$3,600</strong></div>
+            <div class="class-fee" style="margin-top:4px;color:#8e8e93;font-size:11px">週日 · 7–8月</div>
+            <span class="check-mark">✓</span>
+          </label>
+        </div>
+
+        <!-- 費用小計 -->
+        <div class="fee-summary" id="feeSummary">
+          <div id="feeRows"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>備註（選填）</label>
+        <textarea name="notes" placeholder="任何補充說明"></textarea>
+      </div>
+
+      <div id="errorBanner" class="error-banner">送出失敗，請重試或直接聯繫 PACO 老師。</div>
+      <button type="submit" class="submit-btn" id="submitBtn">送出報名</button>
+    </form>
+
+    <div class="success-view" id="successView">
+      <div class="success-icon">✅</div>
+      <h2>報名成功！</h2>
+      <p>PACO 老師已收到您的報名資訊。<br>將盡快透過 LINE 聯繫您確認課程安排與繳費方式。</p>
+    </div>
+  </div>
+
+  <footer>巨石玩理 · PACO 老師線上理化課程</footer>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh7gL_upYsyoKjvEGywwqMLHOig7N3puMIrVM15TonXg_LpR9fcsfwQrBSBCGU60Ju/exec';
+  const TUITION_YEAR = '116';
+
+  let selectedMember = '';
+  let bioPicked = false;
+  let phyPicked = false;
+
+  const FEE = {
+    bio: { member: 2500, nonmember: 3900 },
+    phy: { member: 2500, nonmember: 3600 },
+  };
+
+  function selectMember(val) {
+    selectedMember = val;
+    document.getElementById('memberYes').classList.toggle('selected', val === '是');
+    document.getElementById('memberNo').classList.toggle('selected', val === '否');
+    updateFeeSummary();
+  }
+
+  function toggleClass(cls) {
+    if (cls === 'bio') {
+      bioPicked = !bioPicked;
+      document.getElementById('cbBio').checked = bioPicked;
+      document.getElementById('optBio').classList.toggle('checked-bio', bioPicked);
+    } else {
+      phyPicked = !phyPicked;
+      document.getElementById('cbPhy').checked = phyPicked;
+      document.getElementById('optPhy').classList.toggle('checked-phy', phyPicked);
+    }
+    updateFeeSummary();
+  }
+
+  function updateFeeSummary() {
+    const isMember = selectedMember === '是';
+    const summary  = document.getElementById('feeSummary');
+    const rows     = document.getElementById('feeRows');
+    if (!bioPicked && !phyPicked) { summary.classList.remove('show'); return; }
+
+    let html = '';
+    let total = 0;
+    if (bioPicked) {
+      const fee = isMember && selectedMember ? FEE.bio.member : FEE.bio.nonmember;
+      html += `<div class="fee-row"><span>🌿 生物複習班</span><span>$${fee.toLocaleString()}</span></div>`;
+      total += fee;
+    }
+    if (phyPicked) {
+      const fee = isMember && selectedMember ? FEE.phy.member : FEE.phy.nonmember;
+      html += `<div class="fee-row"><span>⚗️ 理化複習班</span><span>$${fee.toLocaleString()}</span></div>`;
+      total += fee;
+    }
+    if (bioPicked && phyPicked) {
+      html += `<div class="fee-row"><span>合計</span><span class="fee-total">$${total.toLocaleString()}</span></div>`;
+    }
+    rows.innerHTML = html;
+    summary.classList.add('show');
+  }
+
+  document.getElementById('regForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    if (!selectedMember) return alert('請選擇是否為班內生');
+    if (!bioPicked && !phyPicked) return alert('請至少選擇一個班別');
+
+    const btn = document.getElementById('submitBtn');
+    const errorBanner = document.getElementById('errorBanner');
+    btn.disabled = true; btn.textContent = '送出中…';
+    errorBanner.style.display = 'none';
+
+    const raw     = new FormData(this);
+    const payload = { form_type: 'review', tuition_year: TUITION_YEAR };
+    raw.forEach((val, key) => { payload[key] = val.trim ? val.trim() : val; });
+    payload.is_member   = selectedMember;
+    payload.bio_class   = bioPicked ? 'on' : '';
+    payload.phy_class   = phyPicked ? 'on' : '';
+    payload.submitted_at = new Date().toISOString();
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      document.getElementById('regForm').style.display = 'none';
+      document.getElementById('successView').style.display = 'block';
+    } catch (err) {
+      errorBanner.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '送出報名';
+    }
+  });
+</script>
+</body>
+</html>

@@ -229,6 +229,31 @@
     .match-ok  { color: #34c759; font-weight: 700; }
     .match-err { color: #ff3b30; font-weight: 700; }
 
+    /* ── Course Tab Switcher ── */
+    .course-tabs-bar {
+      background: white; padding: 0 20px;
+      display: flex; gap: 4px; border-bottom: 2px solid #f2f2f7;
+    }
+    .ctab {
+      padding: 10px 18px; font-size: 14px; font-weight: 700;
+      border: none; cursor: pointer; background: none; color: #8e8e93;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      font-family: inherit;
+    }
+    .ctab.active { color: #007aff; border-bottom-color: #007aff; }
+
+    /* ── Review tile badges ── */
+    .tile-class-badge {
+      display: inline-block; margin-top: 4px; font-size: 9px; font-weight: 700;
+      padding: 2px 7px; border-radius: 8px;
+    }
+    .class-bio { background: #d1f5d9; color: #1a7a2e; }
+    .class-phy { background: #dbeafe; color: #1d4ed8; }
+
+    /* ── Mode-based show/hide ── */
+    .detail-panel.review-mode .main-only { display: none !important; }
+    .detail-panel.main-mode  .review-only { display: none !important; }
+
     /* ── RWD ── */
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
@@ -255,38 +280,52 @@
     <div class="year-tabs" id="yearTabs"></div>
   </div>
 
-  <div class="stats-row">
-    <div class="stat-card total">
-      <div class="stat-num" id="statTotal">—</div>
-      <div class="stat-label">總學生數</div>
-    </div>
-    <div class="stat-card paid">
-      <div class="stat-num" id="statPaid">—</div>
-      <div class="stat-label">已繳費</div>
-    </div>
-    <div class="stat-card unpaid">
-      <div class="stat-num" id="statUnpaid">—</div>
-      <div class="stat-label">未繳費</div>
-    </div>
-    <div class="stat-card expiring">
-      <div class="stat-num" id="statExpiring">—</div>
-      <div class="stat-label">即將到期</div>
-    </div>
+  <!-- 課程分頁 -->
+  <div class="course-tabs-bar">
+    <button class="ctab active" id="ctabMain"   onclick="switchCourseTab('main')">📅 進度班</button>
+    <button class="ctab"        id="ctabReview" onclick="switchCourseTab('review')">🌿 複習班</button>
   </div>
 
-  <div class="filter-row">
-    <input type="text" id="searchInput" placeholder="搜尋姓名、學校…" oninput="renderGrid()">
-    <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
-    <button class="filter-btn"       onclick="setFilter('unpaid',this)">未繳</button>
-    <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
-    <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
-    <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
-    <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
+  <!-- 進度班 view -->
+  <div id="mainCourseView">
+    <div class="stats-row">
+      <div class="stat-card total">   <div class="stat-num" id="statTotal">—</div>   <div class="stat-label">總學生數</div></div>
+      <div class="stat-card paid">    <div class="stat-num" id="statPaid">—</div>    <div class="stat-label">已繳費</div></div>
+      <div class="stat-card unpaid">  <div class="stat-num" id="statUnpaid">—</div>  <div class="stat-label">未繳費</div></div>
+      <div class="stat-card expiring"><div class="stat-num" id="statExpiring">—</div><div class="stat-label">即將到期</div></div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="searchInput" placeholder="搜尋姓名、學校…" oninput="renderGrid()">
+      <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
+      <button class="filter-btn"       onclick="setFilter('unpaid',this)">未繳</button>
+      <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
+      <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
+      <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
+      <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
+    </div>
+    <div class="tile-grid" id="tileGrid"><div class="loading">載入中…</div></div>
   </div>
 
-  <div class="tile-grid" id="tileGrid">
-    <div class="loading">載入中…</div>
+  <!-- 複習班 view -->
+  <div id="reviewCourseView" style="display:none">
+    <div class="stats-row">
+      <div class="stat-card total">  <div class="stat-num" id="rStatTotal">—</div>  <div class="stat-label">報名人次</div></div>
+      <div class="stat-card paid">   <div class="stat-num" id="rStatPaid">—</div>   <div class="stat-label">已繳費</div></div>
+      <div class="stat-card unpaid"> <div class="stat-num" id="rStatUnpaid">—</div> <div class="stat-label">未繳費</div></div>
+      <div class="stat-card expiring"><div class="stat-num" id="rStatBio">—</div>   <div class="stat-label">生物複習</div></div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="reviewSearchInput" placeholder="搜尋姓名…" oninput="renderReviewGrid()">
+      <button class="filter-btn active" onclick="setReviewFilter('all',this)">全部</button>
+      <button class="filter-btn"       onclick="setReviewFilter('unpaid',this)">未繳</button>
+      <button class="filter-btn"       onclick="setReviewFilter('paid',this)">已繳</button>
+      <button class="filter-btn"       onclick="setReviewFilter('inactive',this)">不續班</button>
+      <button class="filter-btn"       onclick="setReviewFilter('bio',this)">🌿 生物</button>
+      <button class="filter-btn"       onclick="setReviewFilter('phy',this)">⚗️ 理化</button>
+    </div>
+    <div class="tile-grid" id="reviewTileGrid"><div class="loading">點選「複習班」分頁後載入</div></div>
   </div>
+
 </div>
 
 <!-- Detail Panel -->
@@ -314,8 +353,8 @@
       <div class="info-row"><span class="info-icon">💬</span><span class="info-val" id="pLine"></span></div>
     </div>
 
-    <!-- 本期資料 -->
-    <div class="panel-section">
+    <!-- 本期資料（進度班）-->
+    <div class="panel-section main-only">
       <div class="section-title">本期資料</div>
       <div class="period-item">
         <span class="period-lbl">課程方案</span>
@@ -327,8 +366,29 @@
       </div>
     </div>
 
-    <!-- 成績與獎學金 -->
-    <div class="panel-section">
+    <!-- 本期資料（複習班）-->
+    <div class="panel-section review-only">
+      <div class="section-title">複習班資料</div>
+      <div class="period-item">
+        <span class="period-lbl">班別</span>
+        <span class="period-val" id="rClass"></span>
+      </div>
+      <div class="period-item">
+        <span class="period-lbl">身份</span>
+        <span class="period-val" id="rMember"></span>
+      </div>
+      <div class="period-item">
+        <span class="period-lbl">費用</span>
+        <span class="period-val" id="rFee"></span>
+      </div>
+      <div class="period-item">
+        <span class="period-lbl">課程期間</span>
+        <span class="period-val" id="rDateRange"></span>
+      </div>
+    </div>
+
+    <!-- 成績與獎學金（進度班專屬）-->
+    <div class="panel-section main-only">
       <div class="section-title">成績與獎學金</div>
       <div class="period-item" style="margin-bottom:12px">
         <span class="period-lbl">可用獎學金</span>
@@ -368,8 +428,8 @@
       <div class="section-title">操作</div>
       <div class="action-row">
         <button class="panel-btn btn-green" onclick="toggleForm('payForm')">✅ 記錄繳費</button>
-        <button class="panel-btn btn-blue"  onclick="toggleForm('renewForm')">🔄 更新學期</button>
-        <button class="panel-btn btn-gray"  onclick="doMarkInactive()">🚫 不續班</button>
+        <button class="panel-btn btn-blue main-only"  onclick="toggleForm('renewForm')">🔄 更新學期</button>
+        <button class="panel-btn btn-gray"  onclick="handleInactive()">🚫 不續班</button>
       </div>
 
       <!-- 記錄繳費 -->
@@ -382,7 +442,7 @@
           <label>學費金額（元）</label>
           <input type="number" id="payAmount" placeholder="例：9000" oninput="updateNetAmount()">
         </div>
-        <div class="form-field" id="scholarshipRow" style="display:none">
+        <div class="form-field main-only" id="scholarshipRow" style="display:none">
           <label>獎學金折抵（可用 <span id="payScholarshipAvail" style="color:#34c759;font-weight:700">0</span> 元）</label>
           <input type="number" id="payDeduction" placeholder="0" min="0" oninput="updateNetAmount()">
         </div>
@@ -393,7 +453,7 @@
       </div>
 
       <!-- 更新學期 -->
-      <div id="renewForm" class="sub-form hidden">
+      <div id="renewForm" class="sub-form hidden main-only">
         <div class="form-field">
           <label>課程方案</label>
           <select id="renewPlan" onchange="onPlanChange()">
@@ -468,7 +528,7 @@
       </div>
       <div id="importPreview"></div>
       <div id="importRules" style="font-size:12px;color:#8e8e93;margin:10px 0;line-height:1.8">
-        獎學金規則：100分→$500｜90分以上→$300｜進步20分以上→$200（可疊加）
+        獎學金規則：100分→$500｜90分以上→$300｜進步20分以上→$200（三者取最高金額）
       </div>
       <button class="save-btn" id="importSubmit" onclick="doImport()" style="display:none">確認匯入</button>
     </div>
@@ -485,6 +545,13 @@
   let currentScholarship   = 0;
   let _importRows          = [];
   const adminToken         = 'paco2024';
+
+  // 複習班
+  let allReviewStudents    = [];
+  let currentReviewFilter  = 'all';
+  let currentReviewId      = null;
+  let reviewLoaded         = false;
+  let currentTab           = 'main'; // 'main' | 'review'
 
   // ── 日期格式化 ──
   function fmtYM(val) {
@@ -552,6 +619,152 @@
     }
   }
   window.addEventListener('load', loadStudents);
+
+  // ── 課程分頁切換 ──
+  function switchCourseTab(tab) {
+    currentTab = tab;
+    document.getElementById('ctabMain').classList.toggle('active', tab === 'main');
+    document.getElementById('ctabReview').classList.toggle('active', tab === 'review');
+    document.getElementById('mainCourseView').style.display   = tab === 'main'   ? '' : 'none';
+    document.getElementById('reviewCourseView').style.display = tab === 'review' ? '' : 'none';
+    if (tab === 'review' && !reviewLoaded) {
+      reviewLoaded = true;
+      loadReviewStudents();
+    }
+    closeDetail();
+  }
+
+  // ── 複習班載入 ──
+  async function loadReviewStudents() {
+    document.getElementById('reviewTileGrid').innerHTML = '<div class="loading">載入中…</div>';
+    try {
+      const json = await apiGet({ action: 'getReviewStudents' });
+      if (json.status !== 'success') throw new Error(json.message);
+      allReviewStudents = json.data;
+      renderReviewGrid();
+      updateReviewStats();
+    } catch (err) {
+      document.getElementById('reviewTileGrid').innerHTML = `<div class="loading" style="color:#ff3b30">載入失敗<br>${err}</div>`;
+    }
+  }
+
+  function updateReviewStats() {
+    const total  = allReviewStudents.length;
+    const paid   = allReviewStudents.filter(s => s['繳費狀態'] === '已繳').length;
+    const unpaid = allReviewStudents.filter(s => ['待確認','未繳'].includes(s['繳費狀態'])).length;
+    const bio    = allReviewStudents.filter(s => s['班別'] === '生物複習班').length;
+    document.getElementById('rStatTotal').textContent  = total;
+    document.getElementById('rStatPaid').textContent   = paid;
+    document.getElementById('rStatUnpaid').textContent = unpaid;
+    document.getElementById('rStatBio').textContent    = bio;
+  }
+
+  function setReviewFilter(f, btn) {
+    currentReviewFilter = f;
+    document.querySelectorAll('#reviewCourseView .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderReviewGrid();
+  }
+
+  function renderReviewGrid() {
+    const q   = (document.getElementById('reviewSearchInput').value || '').trim().toLowerCase();
+    let list  = allReviewStudents;
+    if (q) list = list.filter(s => (s['學生姓名']||'').toLowerCase().includes(q));
+    if (currentReviewFilter === 'paid')     list = list.filter(s => s['繳費狀態'] === '已繳');
+    if (currentReviewFilter === 'unpaid')   list = list.filter(s => ['待確認','未繳'].includes(s['繳費狀態']));
+    if (currentReviewFilter === 'inactive') list = list.filter(s => s['繳費狀態'] === '不續班');
+    if (currentReviewFilter === 'bio')      list = list.filter(s => s['班別'] === '生物複習班');
+    if (currentReviewFilter === 'phy')      list = list.filter(s => s['班別'] === '理化複習班');
+
+    const grid = document.getElementById('reviewTileGrid');
+    if (!list.length) { grid.innerHTML = '<div class="loading">沒有符合的學生</div>'; return; }
+
+    grid.innerHTML = list.map(s => {
+      const raw    = s['繳費狀態'] || '待確認';
+      const status = raw === '不續班' ? 'inactive' : raw === '已繳' ? 'paid' : 'pending';
+      const isBio  = s['班別'] === '生物複習班';
+      const days   = daysLeft(s['課程截止']);
+      const daysHtml = days === null ? '' :
+        days < 0   ? `<div class="tile-days expired">已到期</div>` :
+        days <= 14 ? `<div class="tile-days soon">剩 ${days} 天</div>` :
+                     `<div class="tile-days">剩 ${days} 天</div>`;
+      return `<div class="tile status-${status}" onclick="openReviewDetail(${s['id']})">
+        <div class="tile-name">${s['學生姓名']||'—'}</div>
+        <span class="tile-class-badge ${isBio?'class-bio':'class-phy'}">${isBio?'生物':'理化'}</span><br>
+        <span class="tile-tag ${status}">${STATUS_LABEL[status]||raw}</span>
+        ${daysHtml}
+      </div>`;
+    }).join('');
+  }
+
+  // ── 開啟複習班詳細 ──
+  function openReviewDetail(id) {
+    currentReviewId = id;
+    const s = allReviewStudents.find(r => r['id'] === id);
+    if (!s) return;
+
+    const panel = document.getElementById('detailPanel');
+    panel.className = 'detail-panel review-mode';
+
+    const raw    = s['繳費狀態'] || '待確認';
+    const status = raw === '不續班' ? 'inactive' : raw === '已繳' ? 'paid' : 'pending';
+    document.getElementById('pName').textContent   = s['學生姓名'] || '—';
+    document.getElementById('pSchool').textContent = (s['就讀學校']||'') + '　' + (s['年級']||'');
+    const badge = document.getElementById('pBadge');
+    badge.textContent  = STATUS_LABEL[status] || raw;
+    badge.className    = `status-badge ${STATUS_BADGE[status] || ''}`;
+
+    document.getElementById('pPhone').textContent   = s['聯絡方式'] || '—';
+    document.getElementById('pAddress').textContent = s['地址'] || '—';
+    document.getElementById('pLine').textContent    = '';
+
+    // 複習班資料
+    const isBio = s['班別'] === '生物複習班';
+    document.getElementById('rClass').innerHTML  = `<span class="tile-class-badge ${isBio?'class-bio':'class-phy'}" style="font-size:13px">${s['班別']||'—'}</span>`;
+    document.getElementById('rMember').textContent  = s['身份'] || '—';
+    document.getElementById('rFee').textContent     = s['費用'] ? `$${Number(s['費用']).toLocaleString()}` : '—';
+    document.getElementById('rDateRange').textContent = `${fmtYM(s['課程開始'])} ～ ${fmtYM(s['課程截止'])}`;
+
+    // 預填繳費日期
+    document.getElementById('payDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('payAmount').value = s['費用'] || '';
+    document.getElementById('netAmountDisplay').style.display = 'none';
+
+    ['payForm', 'renewForm', 'scoreForm'].forEach(f => {
+      const el = document.getElementById(f);
+      if (el) el.classList.add('hidden');
+    });
+
+    // 繳費紀錄 for review: simple paid/unpaid display
+    const histEl = document.getElementById('payHistory');
+    if (s['繳費狀態'] === '已繳') {
+      const dt = s['繳費日期'] ? String(s['繳費日期']).slice(0,10) : '—';
+      histEl.innerHTML = `<div class="hist-row"><div><div class="hist-date">${dt}</div><div class="hist-plan">${s['班別']}</div></div><span class="hist-status badge-paid">已繳費</span></div>`;
+    } else {
+      histEl.innerHTML = '<div style="color:#8e8e93;font-size:13px">尚未繳費</div>';
+    }
+
+    document.getElementById('detailPanel').classList.add('open');
+    document.getElementById('overlay').classList.add('show');
+  }
+
+  // ── 不續班（通用）──
+  function handleInactive() {
+    if (currentTab === 'review') doMarkReviewInactive();
+    else doMarkInactive();
+  }
+
+  async function doMarkReviewInactive() {
+    if (!currentReviewId) return;
+    if (!confirm('確定標記為不續班？')) return;
+    const json = await apiGet({ action: 'markReviewInactive', student_id: currentReviewId });
+    if (json.status === 'success') {
+      const s = allReviewStudents.find(r => r['id'] === currentReviewId);
+      if (s) s['繳費狀態'] = '不續班';
+      renderReviewGrid();
+      closeDetail();
+    }
+  }
 
   // ── 年度分頁 ──
   function initYearTabs() {
@@ -639,6 +852,7 @@
     if (!s) return;
     currentStudentId = id;
     currentScholarship = 0;
+    document.getElementById('detailPanel').className = 'detail-panel main-mode';
 
     const st = getStatus(s);
     document.getElementById('pName').textContent      = s['學生姓名'];
@@ -828,34 +1042,47 @@
 
   // ── 記錄繳費 ──
   async function doRecordPayment() {
-    const date      = document.getElementById('payDate').value;
-    const amount    = parseInt(document.getElementById('payAmount').value) || 0;
-    const deduction = parseInt(document.getElementById('payDeduction').value) || 0;
+    const date   = document.getElementById('payDate').value;
+    const amount = parseInt(document.getElementById('payAmount').value) || 0;
     if (!date) return alert('請填入繳費日期');
-    if (deduction > currentScholarship) return alert(`折抵金額超過可用獎學金（$${currentScholarship}）`);
 
     const btn = document.getElementById('paySubmit');
     btn.disabled = true; btn.textContent = '儲存中…';
 
     try {
-      // 先扣獎學金
-      if (deduction > 0) {
-        const useJson = await apiGet({ action: 'useScholarship', student_id: currentStudentId, amount: deduction, type: '折抵' });
-        if (useJson.status !== 'success') throw new Error(useJson.message || '折抵失敗');
+      if (currentTab === 'review') {
+        // 複習班繳費
+        const json = await apiGet({ action: 'recordReviewPayment', student_id: currentReviewId, payment_date: date, amount });
+        if (json.status !== 'success') throw new Error(json.message || '繳費記錄失敗');
+        const s = allReviewStudents.find(r => r['id'] === currentReviewId);
+        if (s) { s['繳費狀態'] = '已繳'; s['繳費日期'] = date; }
+        renderReviewGrid();
+        updateReviewStats();
+        document.getElementById('pBadge').textContent = '已繳費';
+        document.getElementById('pBadge').className   = 'status-badge badge-paid';
+        document.getElementById('payForm').classList.add('hidden');
+        // 更新 panel 繳費紀錄
+        document.getElementById('payHistory').innerHTML = `<div class="hist-row"><div><div class="hist-date">${date}</div></div><span class="hist-status badge-paid">已繳費</span></div>`;
+      } else {
+        // 進度班繳費（含獎學金折抵）
+        const deduction = parseInt(document.getElementById('payDeduction').value) || 0;
+        if (deduction > currentScholarship) return alert(`折抵金額超過可用獎學金（$${currentScholarship}）`);
+        if (deduction > 0) {
+          const useJson = await apiGet({ action: 'useScholarship', student_id: currentStudentId, amount: deduction, type: '折抵' });
+          if (useJson.status !== 'success') throw new Error(useJson.message || '折抵失敗');
+        }
+        const net  = Math.max(0, amount - deduction);
+        const json = await apiGet({ action: 'recordPayment', student_id: currentStudentId, payment_date: date, amount: net });
+        if (json.status !== 'success') throw new Error(json.message || '繳費記錄失敗');
+        const s = allStudents.find(s => s['id'] === currentStudentId);
+        if (s) s['繳費狀態'] = '已繳';
+        renderGrid();
+        document.getElementById('pBadge').textContent = '已繳費';
+        document.getElementById('pBadge').className   = 'status-badge badge-paid';
+        document.getElementById('payForm').classList.add('hidden');
+        loadScholarshipBalance(currentStudentId);
+        loadPayHistory(currentStudentId);
       }
-      // 記錄繳費
-      const net  = Math.max(0, amount - deduction);
-      const json = await apiGet({ action: 'recordPayment', student_id: currentStudentId, payment_date: date, amount: net });
-      if (json.status !== 'success') throw new Error(json.message || '繳費記錄失敗');
-
-      const s = allStudents.find(s => s['id'] === currentStudentId);
-      if (s) s['繳費狀態'] = '已繳';
-      renderGrid();
-      document.getElementById('pBadge').textContent = '已繳費';
-      document.getElementById('pBadge').className   = 'status-badge badge-paid';
-      document.getElementById('payForm').classList.add('hidden');
-      loadScholarshipBalance(currentStudentId);
-      loadPayHistory(currentStudentId);
     } catch(e) {
       alert('儲存失敗：' + e.message);
     }

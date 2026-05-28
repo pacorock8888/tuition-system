@@ -29,6 +29,7 @@ const STUDENT_SHEET      = '學生名單';
 const PAYMENT_SHEET      = '繳費紀錄';
 const SCORE_SHEET        = '成績紀錄';
 const SCHOLARSHIP_SHEET  = '獎學金紀錄';
+const REVIEW_SHEET       = '複習班名單';
 
 // ============================================================
 //  接收學生報名（POST）
@@ -39,9 +40,15 @@ function doPost(e) {
   output.setMimeType(ContentService.MimeType.JSON);
   try {
     var data = JSON.parse(e.postData.contents);
-    var id   = saveStudent(data);
-    sendNotificationEmail(data, id);
-    output.setContent(JSON.stringify({ status: 'success', id: id }));
+    if (data.form_type === 'review') {
+      var rIds = saveReviewStudents(data);
+      sendReviewNotificationEmail(data, rIds);
+      output.setContent(JSON.stringify({ status: 'success', ids: rIds }));
+    } else {
+      var id = saveStudent(data);
+      sendNotificationEmail(data, id);
+      output.setContent(JSON.stringify({ status: 'success', id: id }));
+    }
   } catch(err) {
     Logger.log('doPost error: ' + err.toString());
     output.setContent(JSON.stringify({ status: 'error', message: err.toString() }));
@@ -113,6 +120,17 @@ function doGet(e) {
       var exam   = e.parameter.exam_name || '段考';
       var scores = JSON.parse(e.parameter.scores || '[]');
       result = { status: 'success', data: importStudentScoresBatch(scores, exam) };
+
+    } else if (action === 'getReviewStudents') {
+      result = { status: 'success', data: getAllReviewStudents() };
+
+    } else if (action === 'recordReviewPayment') {
+      recordReviewStudentPayment(parseInt(e.parameter.student_id), e.parameter.payment_date || '', e.parameter.amount || '');
+      result = { status: 'success' };
+
+    } else if (action === 'markReviewInactive') {
+      markReviewStudentInactive(parseInt(e.parameter.student_id));
+      result = { status: 'success' };
 
     } else {
       result = { status: 'error', message: '未知 action' };
@@ -570,6 +588,140 @@ function setAdminToken() {
 }
 
 // ============================================================
+//  複習班相關函式
+// ============================================================
+
+function getReviewFee(classType, identity) {
+  if (identity === '班內生') return 2500;
+  return classType === '生物複習班' ? 3900 : 3600;
+}
+
+function saveReviewStudents(data) {
+  var ids = [];
+  if (data.bio_class === 'on' || data.bio_class === true || data.bio_class === '是') {
+    ids.push(saveOneReviewStudent(data, '生物複習班'));
+  }
+  if (data.phy_class === 'on' || data.phy_class === true || data.phy_class === '是') {
+    ids.push(saveOneReviewStudent(data, '理化複習班'));
+  }
+  return ids;
+}
+
+function saveOneReviewStudent(data, classType) {
+  var ss     = SpreadsheetApp.openById(SHEET_ID);
+  var sheet  = ss.getSheetByName(REVIEW_SHEET) || createReviewSheet(ss);
+  var id     = getNextIdBySheet(sheet);
+  var identity = (data.is_member === '是') ? '班內生' : '班外生';
+  var fee    = getReviewFee(classType, identity);
+  sheet.appendRow([
+    id,
+    data.submitted_at || new Date().toISOString(),
+    data.tuition_year || '116',
+    data.student_name || '',
+    data.school       || '',
+    data.grade        || '',
+    data.contact      || '',
+    data.address      || '',
+    classType,
+    identity,
+    fee,
+    '2026-07',
+    '2026-08',
+    '待確認',
+    '',
+    data.notes || ''
+  ]);
+  return id;
+}
+
+function getAllReviewStudents() {
+  var ss    = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(REVIEW_SHEET);
+  if (!sheet) return [];
+  var tz      = Session.getScriptTimeZone();
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var result  = [];
+  for (var i = 1; i < data.length; i++) {
+    var obj = {};
+    headers.forEach(function(h, idx) { obj[h] = data[i][idx]; });
+    ['課程開始', '課程截止'].forEach(function(col) {
+      if (obj[col] instanceof Date) {
+        obj[col] = Utilities.formatDate(obj[col], tz, 'yyyy-MM');
+      }
+    });
+    result.push(obj);
+  }
+  return result;
+}
+
+function recordReviewStudentPayment(studentId, paymentDate, amount) {
+  var ss    = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(REVIEW_SHEET);
+  if (!sheet) return;
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var stIdx   = headers.indexOf('繳費狀態');
+  var dtIdx   = headers.indexOf('繳費日期');
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === studentId) {
+      sheet.getRange(i + 1, stIdx + 1).setValue('已繳');
+      if (dtIdx >= 0) sheet.getRange(i + 1, dtIdx + 1).setValue(paymentDate || new Date().toISOString().slice(0, 10));
+      break;
+    }
+  }
+}
+
+function markReviewStudentInactive(studentId) {
+  var ss    = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(REVIEW_SHEET);
+  if (!sheet) return;
+  var data    = sheet.getDataRange().getValues();
+  var headers = data[0];
+  var stIdx   = headers.indexOf('繳費狀態');
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][0] === studentId) {
+      sheet.getRange(i + 1, stIdx + 1).setValue('不續班');
+      break;
+    }
+  }
+}
+
+function createReviewSheet(ss) {
+  var sheet   = ss.insertSheet(REVIEW_SHEET);
+  var headers = ['id','報名時間','學費年度','學生姓名','就讀學校','年級','聯絡方式','地址','班別','身份','費用','課程開始','課程截止','繳費狀態','繳費日期','備註'];
+  var range   = sheet.getRange(1, 1, 1, headers.length);
+  range.setValues([headers]);
+  range.setBackground('#1c1c1e');
+  range.setFontColor('white');
+  range.setFontWeight('bold');
+  sheet.setFrozenRows(1);
+  [40,160,70,80,130,70,160,250,100,70,70,80,80,80,80,160].forEach(function(w,i){ sheet.setColumnWidth(i+1,w); });
+  return sheet;
+}
+
+function sendReviewNotificationEmail(data, ids) {
+  var classes = [];
+  if (data.bio_class === 'on' || data.bio_class === '是') classes.push('生物複習班');
+  if (data.phy_class === 'on' || data.phy_class === '是') classes.push('理化複習班');
+  var body = [
+    '✅ 複習班報名通知',
+    '─────────────',
+    '編號：#' + ids.join(', '),
+    '學生：' + data.student_name,
+    '學校：' + data.school + '　' + (data.grade || ''),
+    '聯絡：' + data.contact,
+    '身份：' + (data.is_member === '是' ? '班內生' : '班外生'),
+    '報名班別：' + (classes.join('、') || '無'),
+    '地址：' + data.address,
+    '備註：' + (data.notes || '無'),
+    '─────────────',
+    '時間：' + data.submitted_at,
+  ].join('\n');
+  MailApp.sendEmail(ADMIN_EMAIL, '【巨石玩理】複習班報名 ' + data.student_name, body);
+}
+
+// ============================================================
 //  步驟二：先執行這個函式，建立試算表結構
 // ============================================================
 
@@ -579,7 +731,8 @@ function initializeSheets() {
   if (!ss.getSheetByName(PAYMENT_SHEET))     createPaymentSheet(ss);
   if (!ss.getSheetByName(SCORE_SHEET))       createScoreSheet(ss);
   if (!ss.getSheetByName(SCHOLARSHIP_SHEET)) createScholarshipSheet(ss);
-  Logger.log('✅ 工作表建立完成（含成績紀錄、獎學金紀錄）');
+  if (!ss.getSheetByName(REVIEW_SHEET))      createReviewSheet(ss);
+  Logger.log('✅ 工作表建立完成（含成績紀錄、獎學金紀錄、複習班名單）');
 }
 
 // ============================================================
