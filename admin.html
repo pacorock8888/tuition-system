@@ -272,29 +272,14 @@
   let currentFilter = 'all';
   const adminToken  = 'paco2024';
 
-  // ── JSONP helper（繞過 CORS）──
-  function jsonpFetch(url) {
-    return new Promise((resolve, reject) => {
-      const cbName = 'cb' + Date.now();
-      window[cbName] = function(data) {
-        delete window[cbName];
-        script.remove();
-        resolve(data);
-      };
-      const script = document.createElement('script');
-      script.onerror = () => { delete window[cbName]; script.remove(); reject(new Error('JSONP failed')); };
-      script.src = url + '&callback=' + cbName;
-      document.head.appendChild(script);
-    });
-  }
-
   // ── 載入資料 ──
   async function loadStudents() {
     const list = document.getElementById('studentList');
     list.innerHTML = '<div class="loading">載入中，請稍候…</div>';
 
     try {
-      const json = await jsonpFetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
+      const res  = await fetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
+      const json = await res.json();
 
       if (json.status === 'error') {
         list.innerHTML = '<div class="loading" style="color:#ff3b30">載入失敗：' + json.message + '</div>';
@@ -449,7 +434,8 @@
 
     try {
       const url = `${SCRIPT_URL}?action=updatePayment&token=${adminToken}&student_id=${id}&payment_status=${encodeURIComponent(status)}`;
-      const json = await jsonpFetch(url);
+      const res  = await fetch(url);
+      const json = await res.json();
 
       if (json.status === 'success') {
         const student = allStudents.find(s => s['id'] === id);
