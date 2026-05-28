@@ -174,12 +174,19 @@ function getAllStudents() {
   var sheet = ss.getSheetByName(STUDENT_SHEET);
   if (!sheet) return [];
 
+  var tz      = Session.getScriptTimeZone();
   var data    = sheet.getDataRange().getValues();
   var headers = data[0];
   var result  = [];
   for (var i = 1; i < data.length; i++) {
     var obj = {};
     headers.forEach(function(h, idx) { obj[h] = data[i][idx]; });
+    // Sheets 會把 "2026-06" 自動轉成 Date，這裡強制轉回 YYYY-MM 字串
+    ['課程開始', '課程截止'].forEach(function(col) {
+      if (obj[col] instanceof Date) {
+        obj[col] = Utilities.formatDate(obj[col], tz, 'yyyy-MM');
+      }
+    });
     result.push(obj);
   }
   return result;
