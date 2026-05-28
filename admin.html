@@ -903,7 +903,8 @@
     const months = plan.startsWith('四個月') ? 4 : plan.startsWith('六個月') ? 6 : 0;
     if (months > 0) {
       const [y, m] = start.split('-').map(Number);
-      const end = new Date(y, m - 1 + months, 1);
+      // 3月起4個月 = 3,4,5,6月 → 結束 6月 → m-1+months-1 = m+months-2
+      const end = new Date(y, m + months - 2, 1);
       document.getElementById('renewEnd').value = end.getFullYear() + '-' + String(end.getMonth() + 1).padStart(2, '0');
     }
   }
