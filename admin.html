@@ -27,18 +27,15 @@
       z-index: 100;
     }
 
-    .topbar h1 { font-size: 17px; font-weight: 700; }
+    .topbar h1 { font-size: 18px; font-weight: 700; }
     .topbar .sub { font-size: 12px; color: #8e8e93; margin-top: 2px; }
 
-    .year-tabs {
-      display: flex;
-      gap: 6px;
-    }
+    .year-tabs { display: flex; gap: 6px; }
 
     .year-tab {
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       background: #3a3a3c;
@@ -46,7 +43,6 @@
       border: none;
       transition: background 0.15s;
     }
-
     .year-tab.active { background: #007aff; color: white; }
 
     /* ── 統計卡片 ── */
@@ -54,36 +50,36 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
-      padding: 16px;
+      padding: 16px 20px;
     }
 
     .stat-card {
       background: white;
-      border-radius: 12px;
-      padding: 14px;
+      border-radius: 14px;
+      padding: 16px;
       text-align: center;
     }
 
     .stat-num {
-      font-size: 26px;
+      font-size: 30px;
       font-weight: 700;
       line-height: 1;
     }
 
     .stat-label {
-      font-size: 11px;
+      font-size: 13px;
       color: #8e8e93;
-      margin-top: 4px;
+      margin-top: 5px;
     }
 
-    .stat-card.total .stat-num  { color: #1c1c1e; }
-    .stat-card.paid .stat-num   { color: #34c759; }
-    .stat-card.unpaid .stat-num { color: #ff3b30; }
+    .stat-card.total .stat-num   { color: #1c1c1e; }
+    .stat-card.paid .stat-num    { color: #34c759; }
+    .stat-card.unpaid .stat-num  { color: #ff3b30; }
     .stat-card.expiring .stat-num { color: #ff9500; }
 
     /* ── 篩選列 ── */
     .filter-row {
-      padding: 0 16px 12px;
+      padding: 0 20px 14px;
       display: flex;
       gap: 8px;
       align-items: center;
@@ -92,21 +88,20 @@
 
     .filter-row input {
       flex: 1;
-      min-width: 160px;
-      padding: 9px 12px;
+      min-width: 180px;
+      padding: 10px 14px;
       border: 1.5px solid #e5e5ea;
       border-radius: 10px;
-      font-size: 14px;
+      font-size: 15px;
       font-family: inherit;
       background: white;
     }
-
     .filter-row input:focus { outline: none; border-color: #007aff; }
 
     .filter-btn {
-      padding: 9px 14px;
+      padding: 10px 16px;
       border-radius: 10px;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       border: 1.5px solid #e5e5ea;
@@ -114,51 +109,58 @@
       color: #3a3a3c;
       transition: all 0.15s;
     }
-
     .filter-btn.active { background: #007aff; color: white; border-color: #007aff; }
 
-    /* ── 學生卡片列表 ── */
-    .list { padding: 0 16px 32px; }
+    /* ── 學生卡片：矩陣網格 ── */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 12px;
+      padding: 0 20px 40px;
+    }
 
     .student-card {
       background: white;
       border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 10px;
-      border-left: 4px solid transparent;
-      display: none; /* 預設隱藏，JS 控制顯示 */
+      padding: 18px;
+      border-top: 4px solid transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
 
-    .student-card.show { display: block; }
-    .student-card.status-paid     { border-left-color: #34c759; }
-    .student-card.status-unpaid   { border-left-color: #ff3b30; }
-    .student-card.status-expiring { border-left-color: #ff9500; }
-    .student-card.status-pending  { border-left-color: #8e8e93; }
+    .student-card.status-paid     { border-top-color: #34c759; }
+    .student-card.status-unpaid   { border-top-color: #ff3b30; }
+    .student-card.status-expiring { border-top-color: #ff9500; }
+    .student-card.status-pending  { border-top-color: #c7c7cc; }
 
     .card-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .student-name {
-      font-size: 17px;
+      font-size: 20px;
       font-weight: 700;
+      letter-spacing: 0.02em;
     }
 
     .student-meta {
-      font-size: 13px;
+      font-size: 14px;
       color: #6c6c70;
-      margin-top: 2px;
+      margin-top: 3px;
     }
 
     .status-badge {
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
       padding: 4px 10px;
       border-radius: 20px;
       white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 8px;
     }
 
     .badge-paid     { background: #d1f5d9; color: #1a7a2e; }
@@ -167,60 +169,75 @@
     .badge-pending  { background: #f2f2f7; color: #6c6c70; }
 
     .card-details {
-      font-size: 13px;
-      color: #6c6c70;
-      line-height: 1.7;
-      margin-top: 8px;
+      font-size: 14px;
+      color: #4a4a4e;
+      line-height: 1.9;
       border-top: 1px solid #f2f2f7;
-      padding-top: 8px;
+      padding-top: 10px;
+      margin-top: 2px;
+      flex: 1;
     }
 
-    .card-details span { margin-right: 12px; }
+    .card-details .row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .card-details .icon {
+      flex-shrink: 0;
+      width: 20px;
+    }
+
+    .card-details .val {
+      color: #1c1c1e;
+      word-break: break-all;
+    }
 
     .card-actions {
       display: flex;
       gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
+      margin-top: 14px;
     }
 
     .action-btn {
-      padding: 8px 14px;
-      border-radius: 8px;
+      flex: 1;
+      padding: 10px 6px;
+      border-radius: 10px;
       font-size: 13px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       border: none;
       transition: opacity 0.15s;
       font-family: inherit;
+      text-align: center;
     }
-
     .action-btn:hover { opacity: 0.8; }
+    .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .btn-paid    { background: #34c759; color: white; }
-    .btn-unpaid  { background: #ff3b30; color: white; }
-    .btn-phone   { background: #f2f2f7; color: #1c1c1e; }
+    .btn-paid   { background: #34c759; color: white; }
+    .btn-unpaid { background: #ff3b30; color: white; }
+    .btn-phone  { background: #f2f2f7; color: #1c1c1e; }
 
-    /* ── Loading / 空白狀態 ── */
+    /* ── Loading ── */
     .loading {
       text-align: center;
       padding: 60px 20px;
       color: #8e8e93;
-      font-size: 15px;
+      font-size: 16px;
+      grid-column: 1 / -1;
     }
 
     #mainView { display: none; }
 
-    /* ── 手機版調整 ── */
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .stat-num  { font-size: 22px; }
+      .stat-num  { font-size: 24px; }
+      .grid      { grid-template-columns: 1fr; padding: 0 12px 40px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── 主介面 ── -->
 <div id="mainView">
 
   <div class="topbar">
@@ -231,7 +248,7 @@
     <div class="year-tabs" id="yearTabs"></div>
   </div>
 
-  <div class="stats-row" id="statsRow">
+  <div class="stats-row">
     <div class="stat-card total">
       <div class="stat-num" id="statTotal">—</div>
       <div class="stat-label">總學生數</div>
@@ -251,14 +268,14 @@
   </div>
 
   <div class="filter-row">
-    <input type="text" id="searchInput" placeholder="搜尋姓名、學校…" oninput="renderList()">
-    <button class="filter-btn active" data-filter="all"     onclick="setFilter('all',this)">全部</button>
-    <button class="filter-btn"        data-filter="unpaid"  onclick="setFilter('unpaid',this)">未繳</button>
-    <button class="filter-btn"        data-filter="expiring" onclick="setFilter('expiring',this)">即將到期</button>
-    <button class="filter-btn"        data-filter="paid"    onclick="setFilter('paid',this)">已繳</button>
+    <input type="text" id="searchInput" placeholder="搜尋姓名、學校、地址…" oninput="renderList()">
+    <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
+    <button class="filter-btn"       onclick="setFilter('unpaid',this)">未繳</button>
+    <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
+    <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
   </div>
 
-  <div class="list" id="studentList">
+  <div class="grid" id="studentList">
     <div class="loading">載入中…</div>
   </div>
 
@@ -272,43 +289,44 @@
   let currentFilter = 'all';
   const adminToken  = 'paco2024';
 
+  // ── 日期格式化（ISO → YYYY/MM）──
+  function fmtDate(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    if (isNaN(d)) return val;
+    return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+
   // ── 載入資料 ──
   async function loadStudents() {
     const list = document.getElementById('studentList');
     list.innerHTML = '<div class="loading">載入中，請稍候…</div>';
-
     try {
       const res  = await fetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
       const json = await res.json();
-
       if (json.status === 'error') {
-        list.innerHTML = '<div class="loading" style="color:#ff3b30">載入失敗：' + json.message + '</div>';
+        list.innerHTML = `<div class="loading" style="color:#ff3b30">載入失敗：${json.message}</div>`;
         return;
       }
-
       allStudents = json.data;
       document.getElementById('mainView').style.display = 'block';
       initYearTabs();
       renderList();
-
     } catch (err) {
-      list.innerHTML = '<div class="loading" style="color:#ff3b30">連線失敗，請稍後重試。<br><br>' + err.toString() + '</div>';
+      list.innerHTML = `<div class="loading" style="color:#ff3b30">連線失敗，請稍後重試。<br><br>${err}</div>`;
       document.getElementById('mainView').style.display = 'block';
     }
   }
 
-  // 頁面載入時自動執行
   window.addEventListener('load', loadStudents);
 
-  // ── 學費年度分頁 ──
+  // ── 年度分頁 ──
   function initYearTabs() {
     const years = [...new Set(allStudents.map(s => s['學費年度']))].sort().reverse();
-    if (years.length === 0) return;
-
+    if (!years.length) return;
     currentYear = years[0];
     const container = document.getElementById('yearTabs');
     container.innerHTML = '';
-
     years.forEach(year => {
       const btn = document.createElement('button');
       btn.className = 'year-tab' + (year === currentYear ? ' active' : '');
@@ -331,41 +349,35 @@
     renderList();
   }
 
-  // ── 計算繳費狀態（用於顯示） ──
-  function getDisplayStatus(student) {
-    const raw = student['繳費狀態'] || '待確認';
-    const end = student['課程截止'] || '';
-
-    // 計算是否即將到期（30 天內）
+  // ── 繳費狀態 ──
+  function getDisplayStatus(s) {
+    const raw = s['繳費狀態'] || '待確認';
+    const end = s['課程截止'] || '';
     let expiringSoon = false;
     if (end) {
-      const endDate = new Date(end.replace(/(\d{4})-(\d{2})$/, '$1-$2-01'));
-      const today   = new Date();
-      const diffDays = (endDate - today) / (1000 * 60 * 60 * 24);
+      const endDate  = new Date(end);
+      const diffDays = (endDate - new Date()) / 86400000;
       if (diffDays >= 0 && diffDays <= 30) expiringSoon = true;
     }
-
     if (raw === '已繳' || raw === '已繳費') return 'paid';
-    if (expiringSoon && raw !== '已繳' && raw !== '已繳費') return 'expiring';
+    if (expiringSoon) return 'expiring';
     if (raw === '未繳' || raw === '到期未繳') return 'unpaid';
     return 'pending';
   }
 
-  // ── 渲染學生卡片 ──
+  // ── 渲染 ──
   function renderList() {
-    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const keyword  = document.getElementById('searchInput').value.toLowerCase();
     const filtered = allStudents.filter(s => {
       if (s['學費年度'] !== currentYear) return false;
       if (keyword) {
-        const hay = (s['學生姓名'] + s['就讀學校'] + s['家長電話']).toLowerCase();
+        const hay = (s['學生姓名'] + s['就讀學校'] + s['家長電話'] + (s['地址'] || '')).toLowerCase();
         if (!hay.includes(keyword)) return false;
       }
-      const status = getDisplayStatus(s);
-      if (currentFilter !== 'all' && status !== currentFilter) return false;
-      return true;
+      const st = getDisplayStatus(s);
+      return currentFilter === 'all' || st === currentFilter;
     });
 
-    // 統計（全年度，不受搜尋篩選影響）
     const yearStudents = allStudents.filter(s => s['學費年度'] === currentYear);
     let paid = 0, unpaid = 0, expiring = 0;
     yearStudents.forEach(s => {
@@ -379,70 +391,62 @@
     document.getElementById('statUnpaid').textContent   = unpaid;
     document.getElementById('statExpiring').textContent = expiring;
 
-    // 渲染卡片
     const container = document.getElementById('studentList');
     container.innerHTML = '';
 
-    if (filtered.length === 0) {
+    if (!filtered.length) {
       container.innerHTML = '<div class="loading">沒有符合條件的學生</div>';
       return;
     }
 
-    filtered.forEach(s => {
-      const status = getDisplayStatus(s);
-      const statusLabels = { paid: '已繳費', unpaid: '未繳費', expiring: '即將到期', pending: '待確認' };
-      const badgeClass   = { paid: 'badge-paid', unpaid: 'badge-unpaid', expiring: 'badge-expiring', pending: 'badge-pending' };
+    const labels = { paid: '已繳費', unpaid: '未繳費', expiring: '即將到期', pending: '待確認' };
+    const badges = { paid: 'badge-paid', unpaid: 'badge-unpaid', expiring: 'badge-expiring', pending: 'badge-pending' };
 
+    filtered.forEach(s => {
+      const st   = getDisplayStatus(s);
       const card = document.createElement('div');
-      card.className = `student-card show status-${status}`;
+      card.className = `student-card status-${st}`;
       card.dataset.id = s['id'];
       card.innerHTML = `
         <div class="card-top">
           <div>
             <div class="student-name">${s['學生姓名']}</div>
-            <div class="student-meta">${s['就讀學校']}　${s['年級'] || ''}</div>
+            <div class="student-meta">${s['就讀學校']}${s['年級'] ? '　' + s['年級'] : ''}</div>
           </div>
-          <span class="status-badge ${badgeClass[status]}">${statusLabels[status]}</span>
+          <span class="status-badge ${badges[st]}">${labels[st]}</span>
         </div>
         <div class="card-details">
-          <span>📱 ${s['家長電話']}</span>
-          <span>💰 ${s['課程方案'] || '—'}</span>
-          <span>📅 ${s['課程開始'] || '—'} ～ ${s['課程截止'] || '—'}</span>
+          <div class="row"><span class="icon">📱</span><span class="val">${s['家長電話'] || '—'}</span></div>
+          <div class="row"><span class="icon">🏠</span><span class="val">${s['地址'] || '—'}</span></div>
+          <div class="row"><span class="icon">💰</span><span class="val">${s['課程方案'] || '—'}</span></div>
+          <div class="row"><span class="icon">📅</span><span class="val">${fmtDate(s['課程開始'])} ～ ${fmtDate(s['課程截止'])}</span></div>
         </div>
         <div class="card-actions">
-          <button class="action-btn btn-paid"   onclick="markPaid(${s['id']}, this)">✅ 標記已繳</button>
-          <button class="action-btn btn-unpaid" onclick="markUnpaid(${s['id']}, this)">❌ 標記未繳</button>
-          <button class="action-btn btn-phone"  onclick="callPhone('${s['家長電話']}')">📞 聯絡家長</button>
+          <button class="action-btn btn-paid"   onclick="markPaid(${s['id']}, this)">✅ 已繳</button>
+          <button class="action-btn btn-unpaid" onclick="markUnpaid(${s['id']}, this)">❌ 未繳</button>
+          <button class="action-btn btn-phone"  onclick="callPhone('${s['家長電話']}')">📞 聯絡</button>
         </div>
       `;
       container.appendChild(card);
     });
   }
 
-  // ── 標記繳費 ──
-  async function markPaid(id, btn) {
-    await updateStatus(id, '已繳', btn);
-  }
-
-  async function markUnpaid(id, btn) {
-    await updateStatus(id, '未繳', btn);
-  }
+  async function markPaid(id, btn)   { await updateStatus(id, '已繳', btn); }
+  async function markUnpaid(id, btn) { await updateStatus(id, '未繳', btn); }
 
   async function updateStatus(id, status, btn) {
     btn.disabled = true;
     btn.textContent = '更新中…';
-
     try {
-      const url = `${SCRIPT_URL}?action=updatePayment&token=${adminToken}&student_id=${id}&payment_status=${encodeURIComponent(status)}`;
+      const url  = `${SCRIPT_URL}?action=updatePayment&token=${adminToken}&student_id=${id}&payment_status=${encodeURIComponent(status)}`;
       const res  = await fetch(url);
       const json = await res.json();
-
       if (json.status === 'success') {
-        const student = allStudents.find(s => s['id'] === id);
-        if (student) student['繳費狀態'] = status;
+        const s = allStudents.find(s => s['id'] === id);
+        if (s) s['繳費狀態'] = status;
         renderList();
       }
-    } catch (err) {
+    } catch {
       btn.disabled = false;
       btn.textContent = '失敗，重試';
     }
