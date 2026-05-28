@@ -4,27 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>巨石玩理 ｜ 學費管理</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Noto Sans TC', sans-serif;
-      background: #f2f2f7;
-      color: #1c1c1e;
-      min-height: 100vh;
+      background: #f2f2f7; color: #1c1c1e; min-height: 100vh;
     }
 
-    /* ── 頂部導覽 ── */
+    /* ── Topbar ── */
     .topbar {
-      background: #1c1c1e;
-      color: white;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      background: #1c1c1e; color: white; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
     }
     .topbar h1  { font-size: 18px; font-weight: 700; }
     .topbar .sub { font-size: 12px; color: #8e8e93; margin-top: 2px; }
@@ -35,12 +28,10 @@
     }
     .year-tab.active { background: #007aff; color: white; }
 
-    /* ── 統計卡片 ── */
+    /* ── Stats ── */
     .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      padding: 16px 20px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 10px; padding: 16px 20px;
     }
     .stat-card { background: white; border-radius: 14px; padding: 14px; text-align: center; }
     .stat-num  { font-size: 28px; font-weight: 700; line-height: 1; }
@@ -50,13 +41,12 @@
     .stat-card.unpaid  .stat-num { color: #ff3b30; }
     .stat-card.expiring .stat-num { color: #ff9500; }
 
-    /* ── 篩選列 ── */
+    /* ── Filter ── */
     .filter-row {
-      padding: 0 20px 14px;
-      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      padding: 0 20px 14px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
     }
     .filter-row input {
-      flex: 1; min-width: 180px; padding: 9px 14px;
+      flex: 1; min-width: 160px; padding: 9px 14px;
       border: 1.5px solid #e5e5ea; border-radius: 10px;
       font-size: 14px; font-family: inherit; background: white;
     }
@@ -66,20 +56,22 @@
       cursor: pointer; border: 1.5px solid #e5e5ea; background: white; color: #3a3a3c;
     }
     .filter-btn.active { background: #007aff; color: white; border-color: #007aff; }
+    .import-btn {
+      padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #e5e5ea; background: #1c1c1e; color: white;
+      margin-left: auto;
+    }
 
-    /* ── 磁磚網格 ── */
+    /* ── Tile Grid ── */
     .tile-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 8px;
-      padding: 0 20px 40px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px; padding: 0 20px 40px;
     }
     .tile {
       background: white; border-radius: 10px; padding: 12px 8px 10px;
       text-align: center; cursor: pointer;
       border-top: 3px solid #c7c7cc;
-      transition: transform 0.1s, box-shadow 0.1s;
-      user-select: none;
+      transition: transform 0.1s, box-shadow 0.1s; user-select: none;
     }
     .tile:hover  { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
     .tile:active { transform: none; box-shadow: none; }
@@ -90,8 +82,7 @@
     .tile.status-inactive { border-top-color: #e5e5ea; opacity: 0.5; }
     .tile-name { font-size: 16px; font-weight: 700; }
     .tile-tag  {
-      display: inline-block; margin-top: 6px;
-      font-size: 10px; font-weight: 600;
+      display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 600;
       padding: 2px 7px; border-radius: 10px;
     }
     .tile-tag.paid     { background: #d1f5d9; color: #1a7a2e; }
@@ -99,12 +90,14 @@
     .tile-tag.expiring { background: #fff3d9; color: #b06000; }
     .tile-tag.pending  { background: #f2f2f7; color: #6c6c70; }
     .tile-tag.inactive { background: #f2f2f7; color: #8e8e93; }
+    .tile-days { font-size: 10px; color: #8e8e93; margin-top: 3px; }
+    .tile-days.soon    { color: #ff9500; font-weight: 700; }
+    .tile-days.expired { color: #ff3b30; }
 
-    /* ── Loading ── */
     .loading { text-align: center; padding: 60px 20px; color: #8e8e93; font-size: 15px; grid-column: 1/-1; }
     #mainView { display: none; }
 
-    /* ── 詳細面板（右側抽屜）── */
+    /* ── Detail Panel ── */
     .overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.35); z-index: 200;
@@ -121,9 +114,8 @@
     .detail-panel.open { right: 0; }
 
     .panel-header {
-      padding: 16px 20px;
-      display: flex; justify-content: space-between; align-items: flex-start;
-      border-bottom: 1px solid #f2f2f7; flex-shrink: 0;
+      padding: 16px 20px; display: flex; justify-content: space-between;
+      align-items: flex-start; border-bottom: 1px solid #f2f2f7; flex-shrink: 0;
     }
     .panel-name   { font-size: 22px; font-weight: 700; }
     .panel-school { font-size: 14px; color: #6c6c70; margin-top: 3px; }
@@ -174,19 +166,16 @@
     .btn-blue  { background: #007aff; color: white; }
     .btn-gray  { background: #f2f2f7; color: #3a3a3c; }
     .btn-red   { background: #ff3b30; color: white; }
+    .btn-orange { background: #ff9500; color: white; }
 
-    .sub-form {
-      margin-top: 14px; background: #f8f8f8;
-      border-radius: 12px; padding: 14px;
-    }
+    .sub-form { margin-top: 14px; background: #f8f8f8; border-radius: 12px; padding: 14px; }
     .sub-form.hidden { display: none; }
 
     .form-field { margin-bottom: 12px; }
     .form-field label { display: block; font-size: 12px; font-weight: 600; color: #6c6c70; margin-bottom: 5px; }
     .form-field input,
     .form-field select {
-      width: 100%; padding: 9px 12px;
-      border: 1.5px solid #e5e5ea; border-radius: 8px;
+      width: 100%; padding: 9px 12px; border: 1.5px solid #e5e5ea; border-radius: 8px;
       font-size: 14px; font-family: inherit; background: white;
       -webkit-appearance: none; appearance: none;
     }
@@ -205,17 +194,53 @@
       padding: 8px 0; border-bottom: 1px solid #f2f2f7; font-size: 14px;
     }
     .hist-row:last-child { border-bottom: none; }
-    .hist-date   { color: #3a3a3c; font-weight: 600; }
-    .hist-plan   { color: #6c6c70; font-size: 13px; }
+    .hist-date { color: #3a3a3c; font-weight: 600; }
+    .hist-plan { color: #6c6c70; font-size: 12px; margin-top: 1px; }
     .hist-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+    .scholarship-earn { color: #34c759; font-weight: 700; font-size: 14px; }
+    .scholarship-big  { font-size: 18px; font-weight: 700; color: #34c759; }
+
+    /* ── Import Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 400;
+      align-items: flex-end; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: white; border-radius: 20px 20px 0 0;
+      padding: 24px 20px 40px; width: 100%; max-width: 600px; max-height: 85vh;
+      display: flex; flex-direction: column;
+    }
+    .modal-title {
+      font-size: 18px; font-weight: 700; margin-bottom: 16px;
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .modal-title button {
+      background: #f2f2f7; border: none; border-radius: 50%;
+      width: 30px; height: 30px; font-size: 14px; cursor: pointer;
+    }
+    .modal-scroll { flex: 1; overflow-y: auto; }
+    .preview-table-wrap { overflow-x: auto; border: 1px solid #e5e5ea; border-radius: 10px; max-height: 220px; overflow-y: auto; }
+    .preview-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .preview-table th { background: #f8f8f8; padding: 7px 10px; text-align: left; font-weight: 600; font-size: 12px; color: #6c6c70; white-space: nowrap; }
+    .preview-table td { padding: 7px 10px; border-top: 1px solid #f2f2f7; }
+    .preview-table tr.no-match td { background: #fff8f8; }
+    .match-ok  { color: #34c759; font-weight: 700; }
+    .match-err { color: #ff3b30; font-weight: 700; }
 
     /* ── RWD ── */
     @media (max-width: 600px) {
       .stats-row { grid-template-columns: repeat(2, 1fr); }
       .stat-num  { font-size: 24px; }
       .tile-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); padding: 0 12px 40px; }
-      .detail-panel { width: 100%; right: auto; bottom: -90vh; top: auto; height: 90vh; border-radius: 20px 20px 0 0; transition: bottom 0.28s cubic-bezier(0.4,0,0.2,1); }
+      .detail-panel { width: 100%; right: auto; bottom: -92vh; top: auto; height: 92vh; border-radius: 20px 20px 0 0; transition: bottom 0.28s cubic-bezier(0.4,0,0.2,1); }
       .detail-panel.open { bottom: 0; }
+      .modal-overlay { align-items: flex-end; }
+    }
+    @media (min-width: 601px) {
+      .modal-overlay { align-items: center; }
+      .modal-box { border-radius: 20px; }
     }
   </style>
 </head>
@@ -256,6 +281,7 @@
     <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
     <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
     <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
+    <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
   </div>
 
   <div class="tile-grid" id="tileGrid">
@@ -263,7 +289,7 @@
   </div>
 </div>
 
-<!-- 詳細面板 -->
+<!-- Detail Panel -->
 <div class="overlay" id="overlay" onclick="closeDetail()"></div>
 
 <div class="detail-panel" id="detailPanel">
@@ -301,29 +327,72 @@
       </div>
     </div>
 
+    <!-- 成績與獎學金 -->
+    <div class="panel-section">
+      <div class="section-title">成績與獎學金</div>
+      <div class="period-item" style="margin-bottom:12px">
+        <span class="period-lbl">可用獎學金</span>
+        <span class="scholarship-big" id="pScholarship">—</span>
+      </div>
+      <div class="action-row" style="margin-bottom:0">
+        <button class="panel-btn btn-blue"   onclick="toggleForm('scoreForm')">📝 輸入成績</button>
+        <button class="panel-btn btn-orange" onclick="doCashOut()">💵 領現金</button>
+      </div>
+
+      <!-- 輸入成績表單 -->
+      <div id="scoreForm" class="sub-form hidden">
+        <div class="form-field">
+          <label>考試名稱</label>
+          <input type="text" id="scoreExamName" placeholder="例：二下二段考">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-field">
+            <label>前次成績（選填）</label>
+            <input type="number" id="scorePrev" placeholder="上次幾分" min="0" max="100" oninput="previewScholarship()">
+          </div>
+          <div class="form-field">
+            <label>當次成績 <span style="color:#ff3b30">*</span></label>
+            <input type="number" id="scoreCurrent" placeholder="這次幾分" min="0" max="100" oninput="previewScholarship()">
+          </div>
+        </div>
+        <div id="scholarshipPreview" style="display:none;color:#34c759;font-size:13px;font-weight:700;margin-bottom:8px;background:#f0fff4;padding:8px 10px;border-radius:8px"></div>
+        <button class="save-btn" id="scoreSubmit" onclick="doAddScore()">確認新增</button>
+      </div>
+
+      <!-- 成績紀錄 -->
+      <div id="scoreHistory" style="margin-top:12px"></div>
+    </div>
+
     <!-- 操作 -->
     <div class="panel-section">
       <div class="section-title">操作</div>
       <div class="action-row">
-        <button class="panel-btn btn-green" id="btnPay"    onclick="toggleForm('payForm')">✅ 記錄繳費</button>
-        <button class="panel-btn btn-blue"  id="btnRenew"  onclick="toggleForm('renewForm')">🔄 更新學期</button>
-        <button class="panel-btn btn-gray"  id="btnInact"  onclick="doMarkInactive()">🚫 不續班</button>
+        <button class="panel-btn btn-green" onclick="toggleForm('payForm')">✅ 記錄繳費</button>
+        <button class="panel-btn btn-blue"  onclick="toggleForm('renewForm')">🔄 更新學期</button>
+        <button class="panel-btn btn-gray"  onclick="doMarkInactive()">🚫 不續班</button>
       </div>
 
-      <!-- 記錄繳費表單 -->
+      <!-- 記錄繳費 -->
       <div id="payForm" class="sub-form hidden">
         <div class="form-field">
           <label>繳費日期</label>
           <input type="date" id="payDate">
         </div>
         <div class="form-field">
-          <label>金額（元）</label>
-          <input type="number" id="payAmount" placeholder="例：9000">
+          <label>學費金額（元）</label>
+          <input type="number" id="payAmount" placeholder="例：9000" oninput="updateNetAmount()">
+        </div>
+        <div class="form-field" id="scholarshipRow" style="display:none">
+          <label>獎學金折抵（可用 <span id="payScholarshipAvail" style="color:#34c759;font-weight:700">0</span> 元）</label>
+          <input type="number" id="payDeduction" placeholder="0" min="0" oninput="updateNetAmount()">
+        </div>
+        <div id="netAmountDisplay" style="font-size:14px;margin-bottom:10px;display:none;color:#3a3a3c">
+          實際收款：<strong id="netAmount" style="color:#007aff;font-size:16px">$0</strong>
         </div>
         <button class="save-btn" id="paySubmit" onclick="doRecordPayment()">確認已繳費</button>
       </div>
 
-      <!-- 更新學期表單 -->
+      <!-- 更新學期 -->
       <div id="renewForm" class="sub-form hidden">
         <div class="form-field">
           <label>課程方案</label>
@@ -340,13 +409,15 @@
           <label>自訂方案名稱</label>
           <input type="text" id="customPlan" placeholder="例：三個月8000">
         </div>
-        <div class="form-field">
-          <label>開始月份</label>
-          <input type="month" id="renewStart" oninput="calcRenewEnd()">
-        </div>
-        <div class="form-field">
-          <label>結束月份</label>
-          <input type="month" id="renewEnd">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-field">
+            <label>開始月份</label>
+            <input type="month" id="renewStart" oninput="calcRenewEnd()">
+          </div>
+          <div class="form-field">
+            <label>結束月份</label>
+            <input type="month" id="renewEnd">
+          </div>
         </div>
         <button class="save-btn" id="renewSubmit" onclick="doUpdatePeriod()">儲存學期</button>
       </div>
@@ -361,28 +432,82 @@
   </div>
 </div>
 
+<!-- Import Modal -->
+<div class="modal-overlay" id="importModal" onclick="onImportOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>批次匯入成績</span>
+      <button onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="modal-scroll">
+      <div class="form-field">
+        <label>考試名稱（例：二下二段考）</label>
+        <input type="text" id="importExamName" placeholder="填完後匯入資料才能計算">
+      </div>
+      <div class="form-field">
+        <label>上傳 Excel 檔案（.xlsx）</label>
+        <input type="file" id="importFile" accept=".xlsx,.xls,.csv" onchange="parseImportFile()" style="font-size:14px;padding:6px 0">
+      </div>
+      <div id="importColSettings" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="form-field" style="margin-bottom:0">
+            <label>姓名欄</label>
+            <select id="colName" onchange="showImportPreview()"></select>
+          </div>
+          <div class="form-field" style="margin-bottom:0">
+            <label>當次成績欄</label>
+            <select id="colCurrent" onchange="showImportPreview()"></select>
+          </div>
+          <div class="form-field" style="margin-bottom:0">
+            <label>前次成績欄</label>
+            <select id="colPrev" onchange="showImportPreview()">
+              <option value="">不選</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="importPreview"></div>
+      <div id="importRules" style="font-size:12px;color:#8e8e93;margin:10px 0;line-height:1.8">
+        獎學金規則：100分→$500｜90分以上→$300｜進步20分以上→$200（可疊加）
+      </div>
+      <button class="save-btn" id="importSubmit" onclick="doImport()" style="display:none">確認匯入</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyh7gL_upYsyoKjvEGywwqMLHOig7N3puMIrVM15TonXg_LpR9fcsfwQrBSBCGU60Ju/exec';
 
-  let allStudents      = [];
-  let currentYear      = '';
-  let currentFilter    = 'all';
-  let currentStudentId = null;
-  const adminToken     = 'paco2024';
+  let allStudents          = [];
+  let currentYear          = '';
+  let currentFilter        = 'all';
+  let currentStudentId     = null;
+  let currentScholarship   = 0;
+  let _importRows          = [];
+  const adminToken         = 'paco2024';
 
   // ── 日期格式化 ──
   function fmtYM(val) {
     if (!val) return '—';
     const d = new Date(val);
-    if (isNaN(d)) return String(val).slice(0, 7);
+    if (isNaN(d)) return String(val).slice(0, 7).replace('-', '/');
     return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0');
   }
 
-  function fmtFull(val) {
-    if (!val) return '—';
-    const d = new Date(val);
-    if (isNaN(d)) return String(val);
-    return d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
+  // ── 剩餘天數 ──
+  function daysLeft(endVal) {
+    if (!endVal) return null;
+    let endDate;
+    const s = String(endVal);
+    if (/^\d{4}-\d{2}$/.test(s)) {
+      const [y, m] = s.split('-').map(Number);
+      endDate = new Date(y, m, 0); // last day of month
+    } else {
+      endDate = new Date(endVal);
+    }
+    if (isNaN(endDate)) return null;
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    return Math.ceil((endDate - today) / 86400000);
   }
 
   // ── 繳費狀態 ──
@@ -391,21 +516,23 @@
     if (raw === '不續班') return 'inactive';
     if (raw === '已繳' || raw === '已繳費') return 'paid';
     if (raw === '未繳' || raw === '到期未繳') return 'unpaid';
-    const end = s['課程截止'];
-    if (end) {
-      const d = new Date(end);
-      if (!isNaN(d)) {
-        const diffDays = (d - new Date()) / 86400000;
-        if (diffDays >= 0 && diffDays <= 30) return 'expiring';
-      }
-    }
+    const days = daysLeft(s['課程截止']);
+    if (days !== null && days >= 0 && days <= 30) return 'expiring';
     return 'pending';
   }
 
-  const STATUS_LABEL = { paid: '已繳費', unpaid: '未繳費', expiring: '即將到期', pending: '待確認', inactive: '不續班' };
-  const STATUS_BADGE = { paid: 'badge-paid', unpaid: 'badge-unpaid', expiring: 'badge-expiring', pending: 'badge-pending', inactive: 'badge-inactive' };
+  const STATUS_LABEL = { paid:'已繳費', unpaid:'未繳費', expiring:'即將到期', pending:'待確認', inactive:'不續班' };
+  const STATUS_BADGE = { paid:'badge-paid', unpaid:'badge-unpaid', expiring:'badge-expiring', pending:'badge-pending', inactive:'badge-inactive' };
 
-  // ── 載入資料 ──
+  // ── API ──
+  async function apiGet(params) {
+    const qs = Object.entries({ token: adminToken, ...params })
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+    const res = await fetch(`${SCRIPT_URL}?${qs}`);
+    return res.json();
+  }
+
+  // ── 載入 ──
   async function loadStudents() {
     try {
       const res  = await fetch(`${SCRIPT_URL}?action=getStudents&token=${adminToken}`);
@@ -416,7 +543,7 @@
       initYearTabs();
       renderGrid();
     } catch (err) {
-      document.getElementById('tileGrid').innerHTML = `<div class="loading" style="color:#ff3b30">連線失敗，請稍後重試。<br><br>${err}</div>`;
+      document.getElementById('tileGrid').innerHTML = `<div class="loading" style="color:#ff3b30">連線失敗<br><br>${err}</div>`;
       document.getElementById('mainView').style.display = 'block';
     }
   }
@@ -427,8 +554,8 @@
     const years = [...new Set(allStudents.map(s => s['學費年度']))].sort().reverse();
     if (!years.length) return;
     currentYear = years[0];
-    const container = document.getElementById('yearTabs');
-    container.innerHTML = '';
+    const c = document.getElementById('yearTabs');
+    c.innerHTML = '';
     years.forEach(year => {
       const btn = document.createElement('button');
       btn.className = 'year-tab' + (year === currentYear ? ' active' : '');
@@ -439,11 +566,10 @@
         btn.classList.add('active');
         renderGrid();
       };
-      container.appendChild(btn);
+      c.appendChild(btn);
     });
   }
 
-  // ── 篩選 ──
   function setFilter(f, btn) {
     currentFilter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -460,11 +586,9 @@
         const hay = (s['學生姓名'] + s['就讀學校'] + (s['地址'] || '')).toLowerCase();
         if (!hay.includes(keyword)) return false;
       }
-      const st = getStatus(s);
-      return currentFilter === 'all' || st === currentFilter;
+      return currentFilter === 'all' || getStatus(s) === currentFilter;
     });
 
-    // 統計（不含不續班）
     let paid = 0, unpaid = 0, expiring = 0;
     year.forEach(s => {
       const st = getStatus(s);
@@ -479,7 +603,6 @@
 
     const grid = document.getElementById('tileGrid');
     grid.innerHTML = '';
-
     if (!filtered.length) {
       grid.innerHTML = '<div class="loading">沒有符合條件的學生</div>';
       return;
@@ -487,22 +610,31 @@
 
     filtered.forEach(s => {
       const st   = getStatus(s);
+      const days = daysLeft(s['課程截止']);
+      let daysHtml = '';
+      if (st !== 'inactive' && days !== null) {
+        if (days < 0)      daysHtml = `<div class="tile-days expired">已到期</div>`;
+        else if (days <= 7) daysHtml = `<div class="tile-days soon">剩 ${days} 天</div>`;
+        else               daysHtml = `<div class="tile-days">剩 ${days} 天</div>`;
+      }
       const tile = document.createElement('div');
       tile.className = `tile status-${st}`;
       tile.onclick   = () => openDetail(s['id']);
       tile.innerHTML = `
         <div class="tile-name">${s['學生姓名']}</div>
         <div class="tile-tag ${st}">${STATUS_LABEL[st]}</div>
+        ${daysHtml}
       `;
       grid.appendChild(tile);
     });
   }
 
-  // ── 開啟詳細面板 ──
+  // ── 詳細面板 ──
   async function openDetail(id) {
     const s = allStudents.find(s => s['id'] === id);
     if (!s) return;
     currentStudentId = id;
+    currentScholarship = 0;
 
     const st = getStatus(s);
     document.getElementById('pName').textContent      = s['學生姓名'];
@@ -517,12 +649,13 @@
     badge.textContent = STATUS_LABEL[st];
     badge.className   = `status-badge ${STATUS_BADGE[st]}`;
 
-    // 預填表單
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('payDate').value   = today;
+    // 預填繳費表單
+    document.getElementById('payDate').value   = new Date().toISOString().split('T')[0];
     document.getElementById('payAmount').value = s['月費金額'] || '';
+    document.getElementById('payDeduction').value = '';
+    document.getElementById('netAmountDisplay').style.display = 'none';
 
-    // 預填更新學期（下一個月開始）
+    // 預填更新學期
     const endVal = s['課程截止'];
     if (endVal) {
       const endD = new Date(endVal);
@@ -531,32 +664,32 @@
         document.getElementById('renewStart').value = endD.getFullYear() + '-' + String(endD.getMonth() + 1).padStart(2, '0');
       }
     }
-    // 比對方案
     const plan = s['課程方案'] || '';
-    const planSelect = document.getElementById('renewPlan');
+    const sel  = document.getElementById('renewPlan');
     let matched = false;
-    for (let opt of planSelect.options) {
-      if (opt.value === plan) { planSelect.value = plan; matched = true; break; }
+    for (let opt of sel.options) {
+      if (opt.value === plan) { sel.value = plan; matched = true; break; }
     }
-    if (!matched) {
-      planSelect.value = 'custom';
-      document.getElementById('customPlan').value = plan;
-      document.getElementById('customPlanRow').style.display = 'block';
-    } else {
-      document.getElementById('customPlanRow').style.display = 'none';
-    }
+    if (!matched) { sel.value = 'custom'; document.getElementById('customPlan').value = plan; document.getElementById('customPlanRow').style.display = 'block'; }
+    else { document.getElementById('customPlanRow').style.display = 'none'; }
     calcRenewEnd();
 
-    // 隱藏子表單
-    document.getElementById('payForm').classList.add('hidden');
-    document.getElementById('renewForm').classList.add('hidden');
+    // 清空成績表單
+    document.getElementById('scoreExamName').value = '';
+    document.getElementById('scorePrev').value     = '';
+    document.getElementById('scoreCurrent').value  = '';
+    document.getElementById('scholarshipPreview').style.display = 'none';
 
-    // 開啟面板
+    // 隱藏子表單
+    ['payForm', 'renewForm', 'scoreForm'].forEach(f => document.getElementById(f).classList.add('hidden'));
+
     document.getElementById('detailPanel').classList.add('open');
     document.getElementById('overlay').classList.add('show');
 
-    // 載入繳費紀錄
-    loadHistory(id);
+    // 載入獎學金、成績、繳費紀錄
+    loadScholarshipBalance(id);
+    loadScoreHistory(id);
+    loadPayHistory(id);
   }
 
   function closeDetail() {
@@ -565,14 +698,198 @@
     currentStudentId = null;
   }
 
-  // ── 切換子表單 ──
   function toggleForm(formId) {
-    const others = ['payForm', 'renewForm'].filter(f => f !== formId);
-    others.forEach(f => document.getElementById(f).classList.add('hidden'));
+    ['payForm', 'renewForm', 'scoreForm'].filter(f => f !== formId)
+      .forEach(f => document.getElementById(f).classList.add('hidden'));
     document.getElementById(formId).classList.toggle('hidden');
   }
 
-  // ── 課程方案切換 ──
+  // ── 獎學金餘額 ──
+  async function loadScholarshipBalance(id) {
+    document.getElementById('pScholarship').textContent = '—';
+    try {
+      const json = await apiGet({ action: 'getScholarshipBalance', student_id: id });
+      if (json.status === 'success') {
+        currentScholarship = json.balance || 0;
+        document.getElementById('pScholarship').textContent = currentScholarship > 0 ? `$${currentScholarship.toLocaleString()}` : '$0';
+        // 顯示折抵欄位
+        if (currentScholarship > 0) {
+          document.getElementById('scholarshipRow').style.display = 'block';
+          document.getElementById('payScholarshipAvail').textContent = currentScholarship.toLocaleString();
+        } else {
+          document.getElementById('scholarshipRow').style.display = 'none';
+        }
+      }
+    } catch(e) {}
+  }
+
+  // ── 成績預覽 ──
+  function previewScholarship() {
+    const cur  = parseInt(document.getElementById('scoreCurrent').value);
+    const prev = document.getElementById('scorePrev').value;
+    const div  = document.getElementById('scholarshipPreview');
+    if (isNaN(cur)) { div.style.display = 'none'; return; }
+    const earned = calcScholarshipAmount(cur, prev !== '' ? parseInt(prev) : null);
+    if (earned > 0) {
+      div.textContent = `🎉 獲得獎學金 $${earned}`;
+      div.style.display = 'block';
+    } else {
+      div.style.display = 'none';
+    }
+  }
+
+  function calcScholarshipAmount(cur, prev) {
+    let total = 0;
+    if (cur === 100) total += 500;
+    else if (cur >= 90) total += 300;
+    if (prev !== null && !isNaN(prev) && (cur - prev) >= 20) total += 200;
+    return total;
+  }
+
+  // ── 新增成績 ──
+  async function doAddScore() {
+    const exam    = document.getElementById('scoreExamName').value.trim();
+    const cur     = parseInt(document.getElementById('scoreCurrent').value);
+    const prevRaw = document.getElementById('scorePrev').value;
+    const prev    = prevRaw !== '' ? parseInt(prevRaw) : '';
+    if (!exam || isNaN(cur)) return alert('請填入考試名稱和當次成績');
+
+    const btn = document.getElementById('scoreSubmit');
+    btn.disabled = true; btn.textContent = '儲存中…';
+
+    const json = await apiGet({ action: 'addScore', student_id: currentStudentId, exam_name: exam, current_score: cur, prev_score: prev });
+    if (json.status === 'success') {
+      document.getElementById('scoreForm').classList.add('hidden');
+      loadScholarshipBalance(currentStudentId);
+      loadScoreHistory(currentStudentId);
+    } else {
+      alert('儲存失敗：' + (json.message || '請重試'));
+    }
+    btn.disabled = false; btn.textContent = '確認新增';
+  }
+
+  // ── 成績紀錄 ──
+  async function loadScoreHistory(id) {
+    const div = document.getElementById('scoreHistory');
+    try {
+      const json = await apiGet({ action: 'getScoreHistory', student_id: id });
+      if (!json.data || !json.data.length) {
+        div.innerHTML = '<div style="color:#8e8e93;font-size:13px">尚無成績紀錄</div>';
+        return;
+      }
+      div.innerHTML = json.data.map(r => {
+        const prev = r['前次成績'] !== '' && r['前次成績'] !== null ? `${r['前次成績']}→` : '';
+        const imp  = r['進步分數'] > 0 ? ` <span style="color:#34c759;font-size:11px">+${r['進步分數']}分</span>` : '';
+        const earn = r['獲得獎學金'] > 0 ? `<span class="scholarship-earn">+$${r['獲得獎學金']}</span>` : '<span style="color:#8e8e93">—</span>';
+        return `
+          <div class="hist-row">
+            <div>
+              <div class="hist-date">${r['考試名稱']}</div>
+              <div class="hist-plan">${prev}${r['當次成績']}分${imp}</div>
+            </div>
+            ${earn}
+          </div>
+        `;
+      }).join('');
+    } catch(e) {
+      div.innerHTML = '<div style="color:#8e8e93;font-size:13px">需更新後台才能載入</div>';
+    }
+  }
+
+  // ── 領現金 ──
+  async function doCashOut() {
+    if (currentScholarship <= 0) return alert('目前沒有可用獎學金');
+    const input = prompt(`領取現金獎學金\n目前餘額：$${currentScholarship.toLocaleString()}\n\n輸入領取金額：`);
+    if (!input) return;
+    const amount = parseInt(input);
+    if (isNaN(amount) || amount <= 0) return alert('請輸入有效金額');
+    if (amount > currentScholarship)  return alert(`超過可用餘額（$${currentScholarship}）`);
+
+    const json = await apiGet({ action: 'useScholarship', student_id: currentStudentId, amount, type: '領現' });
+    if (json.status === 'success') {
+      loadScholarshipBalance(currentStudentId);
+    } else {
+      alert('操作失敗：' + (json.message || ''));
+    }
+  }
+
+  // ── 更新金額顯示 ──
+  function updateNetAmount() {
+    const tuition   = parseInt(document.getElementById('payAmount').value)    || 0;
+    const deduction = parseInt(document.getElementById('payDeduction').value) || 0;
+    const net = Math.max(0, tuition - deduction);
+    document.getElementById('netAmount').textContent = `$${net.toLocaleString()}`;
+    document.getElementById('netAmountDisplay').style.display = deduction > 0 ? 'block' : 'none';
+  }
+
+  // ── 記錄繳費 ──
+  async function doRecordPayment() {
+    const date      = document.getElementById('payDate').value;
+    const amount    = parseInt(document.getElementById('payAmount').value) || 0;
+    const deduction = parseInt(document.getElementById('payDeduction').value) || 0;
+    if (!date) return alert('請填入繳費日期');
+    if (deduction > currentScholarship) return alert(`折抵金額超過可用獎學金（$${currentScholarship}）`);
+
+    const btn = document.getElementById('paySubmit');
+    btn.disabled = true; btn.textContent = '儲存中…';
+
+    try {
+      // 先扣獎學金
+      if (deduction > 0) {
+        const useJson = await apiGet({ action: 'useScholarship', student_id: currentStudentId, amount: deduction, type: '折抵' });
+        if (useJson.status !== 'success') throw new Error(useJson.message || '折抵失敗');
+      }
+      // 記錄繳費
+      const net  = Math.max(0, amount - deduction);
+      const json = await apiGet({ action: 'recordPayment', student_id: currentStudentId, payment_date: date, amount: net });
+      if (json.status !== 'success') throw new Error(json.message || '繳費記錄失敗');
+
+      const s = allStudents.find(s => s['id'] === currentStudentId);
+      if (s) s['繳費狀態'] = '已繳';
+      renderGrid();
+      document.getElementById('pBadge').textContent = '已繳費';
+      document.getElementById('pBadge').className   = 'status-badge badge-paid';
+      document.getElementById('payForm').classList.add('hidden');
+      loadScholarshipBalance(currentStudentId);
+      loadPayHistory(currentStudentId);
+    } catch(e) {
+      alert('儲存失敗：' + e.message);
+    }
+    btn.disabled = false; btn.textContent = '確認已繳費';
+  }
+
+  // ── 繳費紀錄 ──
+  async function loadPayHistory(id) {
+    const div = document.getElementById('payHistory');
+    div.innerHTML = '<div style="color:#8e8e93;font-size:13px">載入中…</div>';
+    try {
+      const json = await apiGet({ action: 'getStudentHistory', student_id: id });
+      if (json.status !== 'success') throw new Error(json.message);
+      if (!json.data.length) {
+        div.innerHTML = '<div style="color:#8e8e93;font-size:13px">尚無繳費紀錄</div>';
+        return;
+      }
+      div.innerHTML = json.data.map(h => {
+        const sc = h['狀態'] === '已繳' ? 'badge-paid' : 'badge-pending';
+        return `
+          <div class="hist-row">
+            <div>
+              <div class="hist-date">${h['繳費月份'] || '—'}</div>
+              <div class="hist-plan">${h['學費年度'] ? h['學費年度'] + '年度' : ''}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:600">${h['金額'] ? '$' + Number(h['金額']).toLocaleString() : '—'}</div>
+              <span class="hist-status ${sc}">${h['狀態']}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch(e) {
+      div.innerHTML = '<div style="color:#8e8e93;font-size:13px">需更新後台才能顯示紀錄</div>';
+    }
+  }
+
+  // ── 更新學期 ──
   function onPlanChange() {
     const v = document.getElementById('renewPlan').value;
     document.getElementById('customPlanRow').style.display = v === 'custom' ? 'block' : 'none';
@@ -591,38 +908,6 @@
     }
   }
 
-  // ── API 呼叫 ──
-  async function apiGet(params) {
-    const qs  = Object.entries({ token: adminToken, ...params }).map(([k,v]) => `${k}=${encodeURIComponent(v)}`).join('&');
-    const res  = await fetch(`${SCRIPT_URL}?${qs}`);
-    return res.json();
-  }
-
-  // ── 記錄繳費 ──
-  async function doRecordPayment() {
-    const date   = document.getElementById('payDate').value;
-    const amount = document.getElementById('payAmount').value;
-    if (!date) return alert('請填入繳費日期');
-
-    const btn = document.getElementById('paySubmit');
-    btn.disabled = true; btn.textContent = '儲存中…';
-
-    const json = await apiGet({ action: 'recordPayment', student_id: currentStudentId, payment_date: date, amount });
-    if (json.status === 'success') {
-      const s = allStudents.find(s => s['id'] === currentStudentId);
-      if (s) s['繳費狀態'] = '已繳';
-      renderGrid();
-      document.getElementById('pBadge').textContent  = '已繳費';
-      document.getElementById('pBadge').className    = 'status-badge badge-paid';
-      document.getElementById('payForm').classList.add('hidden');
-      loadHistory(currentStudentId);
-    } else {
-      alert('儲存失敗：' + (json.message || '請重試'));
-    }
-    btn.disabled = false; btn.textContent = '確認已繳費';
-  }
-
-  // ── 更新學期 ──
   async function doUpdatePeriod() {
     const planSel = document.getElementById('renewPlan').value;
     const plan    = planSel === 'custom' ? document.getElementById('customPlan').value.trim() : planSel;
@@ -649,52 +934,159 @@
     btn.disabled = false; btn.textContent = '儲存學期';
   }
 
-  // ── 標記不續班 ──
+  // ── 不續班 ──
   async function doMarkInactive() {
     const s = allStudents.find(s => s['id'] === currentStudentId);
-    const name = s ? s['學生姓名'] : '此學生';
-    if (!confirm(`確定將 ${name} 標記為不續班？`)) return;
-
+    if (!confirm(`確定將 ${s?.['學生姓名'] || '此學生'} 標記為不續班？`)) return;
     const json = await apiGet({ action: 'markInactive', student_id: currentStudentId });
     if (json.status === 'success') {
-      const s = allStudents.find(s => s['id'] === currentStudentId);
       if (s) s['繳費狀態'] = '不續班';
       renderGrid();
       closeDetail();
     } else {
-      alert('操作失敗：' + (json.message || '請重試'));
+      alert('操作失敗：' + (json.message || ''));
     }
   }
 
-  // ── 載入繳費紀錄 ──
-  async function loadHistory(id) {
-    const div = document.getElementById('payHistory');
-    div.innerHTML = '<div style="color:#8e8e93;font-size:13px">載入中…</div>';
-    try {
-      const json = await apiGet({ action: 'getStudentHistory', student_id: id });
-      if (json.status !== 'success') throw new Error(json.message);
-      if (!json.data.length) {
-        div.innerHTML = '<div style="color:#8e8e93;font-size:13px;padding:4px 0">尚無繳費紀錄</div>';
-        return;
-      }
-      div.innerHTML = json.data.map(h => {
-        const statusColor = h['狀態'] === '已繳' ? 'badge-paid' : 'badge-pending';
-        return `
-          <div class="hist-row">
-            <div>
-              <div class="hist-date">${h['繳費月份'] || '—'}</div>
-              <div class="hist-plan">${h['學費年度'] ? h['學費年度'] + '年度' : ''}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:600">${h['金額'] ? '$' + Number(h['金額']).toLocaleString() : '—'}</div>
-              <span class="hist-status ${statusColor}">${h['狀態']}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    } catch (e) {
-      div.innerHTML = '<div style="color:#8e8e93;font-size:13px">需更新後台才能顯示紀錄</div>';
+  // ══════════════════════════════════════════
+  // 批次匯入成績
+  // ══════════════════════════════════════════
+
+  function openImportModal() {
+    document.getElementById('importModal').classList.add('show');
+    document.getElementById('importFile').value       = '';
+    document.getElementById('importExamName').value   = '';
+    document.getElementById('importColSettings').style.display = 'none';
+    document.getElementById('importPreview').innerHTML = '';
+    document.getElementById('importSubmit').style.display = 'none';
+    _importRows = [];
+  }
+
+  function closeImportModal() {
+    document.getElementById('importModal').classList.remove('show');
+  }
+
+  function onImportOverlayClick(e) {
+    if (e.target === document.getElementById('importModal')) closeImportModal();
+  }
+
+  function parseImportFile() {
+    const file = document.getElementById('importFile').files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const wb      = XLSX.read(e.target.result, { type: 'array' });
+      const sheet   = wb.Sheets[wb.SheetNames[0]];
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      if (rawRows.length < 2) return alert('檔案內容太少，請確認格式');
+
+      const headers = rawRows[0].map(String);
+      _importRows   = rawRows.slice(1).filter(r => r.some(c => c !== ''));
+
+      // 填入欄位選單
+      ['colName', 'colCurrent', 'colPrev'].forEach(id => {
+        const sel = document.getElementById(id);
+        const prevVal = sel.value;
+        sel.innerHTML = id === 'colPrev' ? '<option value="">不選</option>' : '';
+        headers.forEach((h, i) => {
+          const opt = document.createElement('option');
+          opt.value = i;
+          opt.textContent = h || `欄 ${i + 1}`;
+          // 自動猜測
+          if (id === 'colName'    && (h.includes('姓名') || h.includes('名字')))    opt.selected = true;
+          if (id === 'colCurrent' && h.includes('二段'))                              opt.selected = true;
+          if (id === 'colPrev'    && h.includes('一段'))                              opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+
+      document.getElementById('importColSettings').style.display = 'block';
+      showImportPreview();
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function showImportPreview() {
+    if (!_importRows.length) return;
+    const nameCol    = parseInt(document.getElementById('colName').value);
+    const curCol     = parseInt(document.getElementById('colCurrent').value);
+    const prevColVal = document.getElementById('colPrev').value;
+    const prevCol    = prevColVal !== '' ? parseInt(prevColVal) : null;
+
+    const processed = _importRows.map(row => {
+      const name    = String(row[nameCol] || '').trim();
+      const cur     = parseFloat(row[curCol]);
+      const prev    = prevCol !== null ? parseFloat(row[prevCol]) : null;
+      const matched = allStudents.find(s => s['學生姓名'] === name);
+      const scholarship = !isNaN(cur) ? calcScholarshipAmount(cur, prev !== null && !isNaN(prev) ? prev : null) : 0;
+      return { name, cur, prev, matched: !!matched, matchedId: matched?.['id'], scholarship };
+    }).filter(r => r.name);
+
+    const matchCount = processed.filter(r => r.matched).length;
+
+    document.getElementById('importPreview').innerHTML = `
+      <div style="font-size:12px;color:#6c6c70;margin:10px 0 6px">${processed.length} 筆　匹配成功 ${matchCount} 筆　未匹配 ${processed.length - matchCount} 筆</div>
+      <div class="preview-table-wrap">
+        <table class="preview-table">
+          <tr>
+            <th>姓名</th><th>前次</th><th>當次</th><th>進步</th><th>獎學金</th><th>狀態</th>
+          </tr>
+          ${processed.map(r => {
+            const imp = (r.prev !== null && !isNaN(r.prev) && !isNaN(r.cur)) ? r.cur - r.prev : null;
+            return `
+              <tr class="${!r.matched ? 'no-match' : ''}">
+                <td>${r.name}</td>
+                <td style="text-align:center">${r.prev !== null && !isNaN(r.prev) ? r.prev : '—'}</td>
+                <td style="text-align:center;font-weight:600">${!isNaN(r.cur) ? r.cur : '—'}</td>
+                <td style="text-align:center;color:${imp >= 20 ? '#34c759' : '#8e8e93'}">${imp !== null ? (imp > 0 ? '+' + imp : imp) : '—'}</td>
+                <td style="text-align:right;color:#34c759;font-weight:700">${r.scholarship > 0 ? '+$' + r.scholarship : '—'}</td>
+                <td style="text-align:center"><span class="${r.matched ? 'match-ok' : 'match-err'}">${r.matched ? '✓' : '未匹配'}</span></td>
+              </tr>
+            `;
+          }).join('')}
+        </table>
+      </div>
+    `;
+
+    window._importPreview = processed;
+    const btn = document.getElementById('importSubmit');
+    btn.style.display   = matchCount > 0 ? 'block' : 'none';
+    btn.textContent     = `確認匯入 ${matchCount} 筆`;
+  }
+
+  async function doImport() {
+    const examName = document.getElementById('importExamName').value.trim();
+    if (!examName) return alert('請填入考試名稱');
+
+    const toImport = (window._importPreview || []).filter(r => r.matched).map(r => ({
+      id:   r.matchedId,
+      cur:  r.cur,
+      prev: r.prev !== null && !isNaN(r.prev) ? r.prev : ''
+    }));
+    if (!toImport.length) return;
+
+    const btn = document.getElementById('importSubmit');
+    btn.disabled = true; btn.textContent = '匯入中…';
+
+    // 分批每次 20 筆
+    const batchSize = 20;
+    let success = true;
+    for (let i = 0; i < toImport.length; i += batchSize) {
+      const batch = toImport.slice(i, i + batchSize);
+      const json  = await apiGet({
+        action:    'importScores',
+        exam_name: examName,
+        scores:    JSON.stringify(batch)
+      });
+      if (json.status !== 'success') { alert('匯入失敗：' + (json.message || '')); success = false; break; }
     }
+
+    if (success) {
+      alert(`✅ 已匯入 ${toImport.length} 筆成績！`);
+      closeImportModal();
+    }
+    btn.disabled = false; btn.textContent = `確認匯入 ${toImport.length} 筆`;
   }
 </script>
 </body>
