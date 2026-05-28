@@ -592,7 +592,9 @@ function setAdminToken() {
 // ============================================================
 
 function getReviewFee(classType, identity) {
-  if (identity === '班內生') return 2500;
+  if (identity === '班內生') {
+    return classType === '生物複習班' ? 2900 : 2500;
+  }
   return classType === '生物複習班' ? 3900 : 3600;
 }
 
