@@ -362,13 +362,13 @@ function createPaymentSheet(ss) {
 // ============================================================
 
 function calcScholarship(current, prev) {
-  var earned = 0;
-  if (current === 100) earned += 500;
-  else if (current >= 90) earned += 300;
-  if (prev !== null && prev !== undefined && !isNaN(prev)) {
-    if ((current - prev) >= 20) earned += 200;
+  var candidates = [];
+  if (current === 100) candidates.push(500);
+  if (current >= 90)   candidates.push(300);
+  if (prev !== null && prev !== undefined && !isNaN(prev) && (current - prev) >= 20) {
+    candidates.push(200);
   }
-  return earned;
+  return candidates.length > 0 ? Math.max.apply(null, candidates) : 0;
 }
 
 // ============================================================
