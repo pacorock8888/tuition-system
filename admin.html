@@ -77,6 +77,11 @@
       cursor: pointer; margin-top: 10px; font-family: inherit;
     }
     .copy-btn:active { opacity: 0.8; }
+    .list-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .list-table th { background: #f2f2f7; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 700; color: #6c6c70; position: sticky; top: 0; }
+    .list-table td { padding: 8px 10px; border-bottom: 1px solid #f2f2f7; vertical-align: top; }
+    .list-table tr:last-child td { border-bottom: none; }
+    .list-table td:first-child { font-weight: 600; white-space: nowrap; }
 
     /* ── Tile Grid ── */
     .tile-grid {
@@ -317,6 +322,9 @@
       <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
       <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
       <button class="link-btn"         onclick="openLinkModal()">🔗 產生連結</button>
+      <button class="link-btn" style="background:#5856d6;border-color:#5856d6" onclick="openListModal()">📋 學生清單</button>
+      <button class="link-btn" style="background:#34c759;border-color:#34c759" onclick="exportStudents()">📤 匯出</button>
+      <button class="link-btn" style="background:#8e8e93;border-color:#8e8e93" onclick="loadStudents()">🔄 重整</button>
     </div>
     <div class="tile-grid" id="tileGrid"><div class="loading">載入中…</div></div>
   </div>
@@ -525,6 +533,27 @@
       <div id="payHistory"><div style="color:#8e8e93;font-size:13px">載入中…</div></div>
     </div>
 
+  </div>
+</div>
+
+<!-- Student List Modal -->
+<div class="modal-overlay" id="listModal" onclick="if(event.target===this)closeListModal()">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span id="listModalTitle">📋 學生清單</span>
+      <button onclick="closeListModal()">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0">
+      <input type="text" id="listSearch" placeholder="搜尋姓名…" oninput="renderListTable()"
+        style="flex:1;padding:8px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+      <button onclick="copyAllAddresses()" style="padding:8px 14px;background:#5856d6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">複製地址</button>
+    </div>
+    <div class="modal-scroll">
+      <table class="list-table">
+        <thead><tr><th>姓名</th><th>電話</th><th>地址</th></tr></thead>
+        <tbody id="listTableBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -1325,6 +1354,59 @@
   }
   function closeLinkModal() {
     document.getElementById('linkModal').classList.remove('show');
+  }
+
+  // ── 學生清單 ──
+  function openListModal() {
+    document.getElementById('listSearch').value = '';
+    document.getElementById('listModalTitle').textContent = `📋 學生清單（${currentYear} 年度）`;
+    renderListTable();
+    document.getElementById('listModal').classList.add('show');
+  }
+  function closeListModal() {
+    document.getElementById('listModal').classList.remove('show');
+  }
+  function renderListTable() {
+    const kw   = document.getElementById('listSearch').value.toLowerCase();
+    const list = allStudents
+      .filter(s => s['學費年度'] === currentYear && getStatus(s) !== 'inactive')
+      .filter(s => !kw || s['學生姓名'].toLowerCase().includes(kw));
+    document.getElementById('listTableBody').innerHTML = list.map(s => `
+      <tr>
+        <td>${s['學生姓名']}<br><span style="font-size:11px;color:#8e8e93;font-weight:400">${s['就讀學校']||''}</span></td>
+        <td style="white-space:nowrap">${s['家長電話']||'—'}</td>
+        <td style="font-size:12px;color:#3a3a3c">${s['地址']||'—'}</td>
+      </tr>
+    `).join('');
+  }
+  function copyAllAddresses() {
+    const kw   = document.getElementById('listSearch').value.toLowerCase();
+    const list = allStudents
+      .filter(s => s['學費年度'] === currentYear && getStatus(s) !== 'inactive')
+      .filter(s => !kw || s['學生姓名'].toLowerCase().includes(kw));
+    const text = list.map(s => `${s['學生姓名']}\t${s['家長電話']||''}\t${s['地址']||''}`).join('\n');
+    navigator.clipboard.writeText(text).then(() => alert(`✅ 已複製 ${list.length} 筆資料`));
+  }
+
+  // ── 匯出 Excel ──
+  function exportStudents() {
+    const list = allStudents.filter(s => s['學費年度'] === currentYear);
+    const rows = list.map(s => ({
+      '學生姓名': s['學生姓名'],
+      '就讀學校': s['就讀學校'] || '',
+      '家長電話': String(s['家長電話'] || ''),
+      'LINE ID':  s['LINE ID'] || '',
+      '地址':     s['地址'] || '',
+      '課程方案': s['課程方案'] || '',
+      '課程開始': s['課程開始'] || '',
+      '課程截止': s['課程截止'] || '',
+      '繳費狀態': s['繳費狀態'] || '',
+      '備註':     s['備註'] || ''
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `${currentYear}年度學生`);
+    XLSX.writeFile(wb, `學生名單_${currentYear}年度.xlsx`);
   }
   function updateLinkOutput() {
     const year = document.getElementById('linkYear').value.trim();
