@@ -592,6 +592,10 @@
     </div>
     <div class="modal-scroll">
       <div class="form-field">
+        <label>學費年度</label>
+        <select id="importYear" onchange="showImportPreview()"></select>
+      </div>
+      <div class="form-field">
         <label>考試名稱</label>
         <select id="importExamName">
           <option value="">請選擇</option>
@@ -1303,6 +1307,11 @@
   // ══════════════════════════════════════════
 
   function openImportModal() {
+    // 填入可用年度
+    const years = [...new Set(allStudents.map(s => s['學費年度']))].sort((a, b) => b - a);
+    const yearSel = document.getElementById('importYear');
+    yearSel.innerHTML = years.map(y => `<option value="${y}"${y === currentYear ? ' selected' : ''}>${y} 年度</option>`).join('');
+
     document.getElementById('importModal').classList.add('show');
     document.getElementById('importFile').value       = '';
     document.getElementById('importExamName').value   = '';
@@ -1502,12 +1511,13 @@
     const curCol     = parseInt(document.getElementById('colCurrent').value);
     const prevColVal = document.getElementById('colPrev').value;
     const prevCol    = prevColVal !== '' ? parseInt(prevColVal) : null;
+    const importYear = document.getElementById('importYear').value;
 
     const processed = _importRows.map(row => {
       const name    = String(row[nameCol] || '').trim();
       const cur     = parseFloat(row[curCol]);
       const prev    = prevCol !== null ? parseFloat(row[prevCol]) : null;
-      const matched = allStudents.find(s => s['學生姓名'] === name);
+      const matched = allStudents.find(s => s['學生姓名'] === name && s['學費年度'] === importYear);
       const scholarship = !isNaN(cur) ? calcScholarshipAmount(cur, prev !== null && !isNaN(prev) ? prev : null) : 0;
       return { name, cur, prev, matched: !!matched, matchedId: matched?.['id'], scholarship };
     }).filter(r => r.name);
