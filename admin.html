@@ -91,9 +91,11 @@
     }
     .tile:hover  { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
     .tile:active { transform: none; box-shadow: none; }
+    .tile.status-active   { border-top-color: #34c759; }
     .tile.status-paid     { border-top-color: #34c759; }
     .tile.status-unpaid   { border-top-color: #ff3b30; }
     .tile.status-expiring { border-top-color: #ff9500; }
+    .tile.status-expired  { border-top-color: #ff3b30; }
     .tile.status-pending  { border-top-color: #c7c7cc; }
     .tile.status-inactive { border-top-color: #e5e5ea; opacity: 0.5; }
     .tile-name { font-size: 16px; font-weight: 700; }
@@ -101,9 +103,11 @@
       display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 600;
       padding: 2px 7px; border-radius: 10px;
     }
+    .tile-tag.active   { background: #d1f5d9; color: #1a7a2e; }
     .tile-tag.paid     { background: #d1f5d9; color: #1a7a2e; }
     .tile-tag.unpaid   { background: #ffe4e4; color: #c0392b; }
     .tile-tag.expiring { background: #fff3d9; color: #b06000; }
+    .tile-tag.expired  { background: #ffe4e4; color: #c0392b; }
     .tile-tag.pending  { background: #f2f2f7; color: #6c6c70; }
     .tile-tag.inactive { background: #f2f2f7; color: #8e8e93; }
     .tile-days { font-size: 10px; color: #8e8e93; margin-top: 3px; }
@@ -309,7 +313,7 @@
       <button class="filter-btn active" onclick="setFilter('all',this)">全部</button>
       <button class="filter-btn"       onclick="setFilter('unpaid',this)">未繳</button>
       <button class="filter-btn"       onclick="setFilter('expiring',this)">即將到期</button>
-      <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
+      <button class="filter-btn"       onclick="setFilter('active',this)">上課中</button>
       <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
       <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
       <button class="link-btn"         onclick="openLinkModal()">🔗 產生連結</button>
@@ -667,15 +671,17 @@
   function getStatus(s) {
     const raw = s['繳費狀態'] || '待確認';
     if (raw === '不續班') return 'inactive';
-    if (raw === '已繳' || raw === '已繳費') return 'paid';
     if (raw === '未繳' || raw === '到期未繳') return 'unpaid';
+    // 已繳、已繳費、待確認 → 依課程日期判斷
     const days = daysLeft(s['課程截止']);
-    if (days !== null && days >= 0 && days <= 30) return 'expiring';
-    return 'pending';
+    if (days === null) return 'pending';   // 尚未設定課程期間
+    if (days < 0)      return 'expired';   // 課程已結束
+    if (days <= 7)     return 'expiring';  // 即將到期
+    return 'active';                       // 上課中
   }
 
-  const STATUS_LABEL = { paid:'已繳費', unpaid:'未繳費', expiring:'即將到期', pending:'待確認', inactive:'不續班' };
-  const STATUS_BADGE = { paid:'badge-paid', unpaid:'badge-unpaid', expiring:'badge-expiring', pending:'badge-pending', inactive:'badge-inactive' };
+  const STATUS_LABEL = { active:'上課中', paid:'上課中', unpaid:'未繳費', expiring:'即將到期', expired:'已到期', pending:'待確認', inactive:'不續班' };
+  const STATUS_BADGE = { active:'badge-paid', paid:'badge-paid', unpaid:'badge-unpaid', expiring:'badge-expiring', expired:'badge-unpaid', pending:'badge-pending', inactive:'badge-inactive' };
 
   // ── API ──
   async function apiGet(params) {
@@ -891,7 +897,7 @@
     let paid = 0, unpaid = 0, expiring = 0;
     year.forEach(s => {
       const st = getStatus(s);
-      if (st === 'paid')     paid++;
+      if (st === 'active' || st === 'paid') paid++;
       if (st === 'unpaid')   unpaid++;
       if (st === 'expiring') expiring++;
     });
@@ -1463,6 +1469,8 @@
     if (success) {
       alert(`✅ 已匯入 ${toImport.length} 筆成績！`);
       closeImportModal();
+      // 如果詳細面板是打開的，重新載入該學生的成績紀錄
+      if (currentStudentId) loadScoreHistory(currentStudentId);
     }
     btn.disabled = false; btn.textContent = `確認匯入 ${toImport.length} 筆`;
   }
