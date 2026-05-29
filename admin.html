@@ -642,7 +642,7 @@
         <input type="file" id="importFile" accept=".xlsx,.xls,.csv" onchange="parseImportFile()" style="font-size:14px;padding:6px 0">
       </div>
       <div id="importColSettings" style="display:none">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
           <div class="form-field" style="margin-bottom:0">
             <label>姓名欄</label>
             <select id="colName" onchange="showImportPreview()"></select>
@@ -650,12 +650,6 @@
           <div class="form-field" style="margin-bottom:0">
             <label>當次成績欄</label>
             <select id="colCurrent" onchange="showImportPreview()"></select>
-          </div>
-          <div class="form-field" style="margin-bottom:0">
-            <label>前次成績欄</label>
-            <select id="colPrev" onchange="showImportPreview()">
-              <option value="">不選</option>
-            </select>
           </div>
         </div>
       </div>
@@ -1621,22 +1615,18 @@
         }
         return 0;
       };
-      const curColGuess  = findScoreCol(-1);
-      const prevNameKw   = ['前次', '上次', '上一段'];
-      const prevColGuess = headers.findIndex((h, i) =>
-        i !== curColGuess && prevNameKw.some(k => String(h).includes(k)));
+      const curColGuess = findScoreCol(-1);
 
       // 填入欄位選單
-      ['colName', 'colCurrent', 'colPrev'].forEach(id => {
+      ['colName', 'colCurrent'].forEach(id => {
         const sel = document.getElementById(id);
-        sel.innerHTML = id === 'colPrev' ? '<option value="">不選</option>' : '';
+        sel.innerHTML = '';
         headers.forEach((h, i) => {
           const opt = document.createElement('option');
           opt.value = i;
           opt.textContent = h || `欄 ${i + 1}`;
-          if (id === 'colName'    && i === nameColGuess)  opt.selected = true;
-          if (id === 'colCurrent' && i === curColGuess)   opt.selected = true;
-          if (id === 'colPrev'    && i === prevColGuess)  opt.selected = true;
+          if (id === 'colName'    && i === nameColGuess) opt.selected = true;
+          if (id === 'colCurrent' && i === curColGuess)  opt.selected = true;
           sel.appendChild(opt);
         });
       });
@@ -1659,17 +1649,14 @@
     if (!_importRows.length) return;
     const nameCol    = parseInt(document.getElementById('colName').value);
     const curCol     = parseInt(document.getElementById('colCurrent').value);
-    const prevColVal = document.getElementById('colPrev').value;
-    const prevCol    = prevColVal !== '' ? parseInt(prevColVal) : null;
     const importYear = document.getElementById('importYear').value;
 
     const processed = _importRows.map(row => {
-      const name    = String(row[nameCol] || '').trim();
-      const cur     = safeParseScore(row[curCol]);
-      const prev    = prevCol !== null ? safeParseScore(row[prevCol]) : null;
-      const matched = allStudents.find(s => s['學生姓名'] === name && String(s['學費年度']) === String(importYear));
-      const scholarship = !isNaN(cur) ? calcScholarshipAmount(cur, prev !== null && !isNaN(prev) ? prev : null) : 0;
-      return { name, cur, prev, matched: !!matched, matchedId: matched?.['id'], scholarship };
+      const name       = String(row[nameCol] || '').trim();
+      const cur        = safeParseScore(row[curCol]);
+      const matched    = allStudents.find(s => s['學生姓名'] === name && String(s['學費年度']) === String(importYear));
+      const scholarship = !isNaN(cur) ? calcScholarshipAmount(cur, null) : 0;
+      return { name, cur, matched: !!matched, matchedId: matched?.['id'], scholarship };
     }).filter(r => r.name);
 
     const matchCount = processed.filter(r => r.matched).length;
@@ -1679,21 +1666,16 @@
       <div class="preview-table-wrap">
         <table class="preview-table">
           <tr>
-            <th>姓名</th><th>前次</th><th>當次</th><th>進步</th><th>獎學金</th><th>狀態</th>
+            <th>姓名</th><th>當次成績</th><th>獎學金</th><th>狀態</th>
           </tr>
-          ${processed.map(r => {
-            const imp = (r.prev !== null && !isNaN(r.prev) && !isNaN(r.cur)) ? r.cur - r.prev : null;
-            return `
+          ${processed.map(r => `
               <tr class="${!r.matched ? 'no-match' : ''}">
                 <td>${r.name}</td>
-                <td style="text-align:center">${r.prev !== null && !isNaN(r.prev) ? r.prev : '—'}</td>
                 <td style="text-align:center;font-weight:600">${!isNaN(r.cur) ? r.cur : '—'}</td>
-                <td style="text-align:center;color:${imp >= 20 ? '#34c759' : '#8e8e93'}">${imp !== null ? (imp > 0 ? '+' + imp : imp) : '—'}</td>
                 <td style="text-align:right;color:#34c759;font-weight:700">${r.scholarship > 0 ? '+$' + r.scholarship : '—'}</td>
                 <td style="text-align:center"><span class="${r.matched ? 'match-ok' : 'match-err'}">${r.matched ? '✓' : '未匹配'}</span></td>
               </tr>
-            `;
-          }).join('')}
+            `).join('')}
         </table>
       </div>
     `;
@@ -1711,7 +1693,7 @@
     const toImport = (window._importPreview || []).filter(r => r.matched).map(r => ({
       student_id:    r.matchedId,
       current_score: r.cur,
-      prev_score:    r.prev !== null && !isNaN(r.prev) ? r.prev : ''
+      prev_score:    ''
     }));
     if (!toImport.length) return;
 
