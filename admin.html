@@ -513,12 +513,14 @@
     <div class="modal-scroll">
       <div class="form-field">
         <label>學費年度</label>
-        <input type="text" id="linkYear" placeholder="例：116、117" oninput="updateLinkOutput()">
+        <input type="text" id="linkYear" list="yearSuggestions" placeholder="例：116、117" oninput="updateLinkOutput()" autocomplete="off">
+        <datalist id="yearSuggestions"></datalist>
       </div>
       <div class="form-field">
         <label>課程方案名稱</label>
-        <input type="text" id="linkPlan" placeholder="例：四個月9600" oninput="updateLinkOutput()">
-        <div style="font-size:12px;color:#8e8e93;margin-top:4px">學生填表時會看到這個方案名稱，無法修改</div>
+        <input type="text" id="linkPlan" list="planSuggestions" placeholder="例：四個月9600" oninput="updateLinkOutput()" autocomplete="off">
+        <datalist id="planSuggestions"></datalist>
+        <div style="font-size:12px;color:#8e8e93;margin-top:4px">學生填表時會看到這個方案名稱，無法修改。複製連結後會自動記住此選項。</div>
       </div>
       <div class="link-output" id="linkOutput"></div>
       <button class="copy-btn" id="copyBtn" onclick="copyRegLink()" style="display:none">複製連結</button>
@@ -1241,11 +1243,35 @@
   }
 
   // ── 報名連結產生器 ──
+  const DEFAULT_YEARS = ['116', '117', '118'];
+  const DEFAULT_PLANS = ['四個月9600', '四個月10800', '六個月13800', '六個月15600'];
+
+  function getLinkMemory(key, defaults) {
+    try { return [...new Set([...defaults, ...(JSON.parse(localStorage.getItem(key) || '[]'))])]; }
+    catch(e) { return defaults; }
+  }
+  function saveLinkMemory(key, value, defaults) {
+    if (!value) return;
+    const list = getLinkMemory(key, defaults);
+    if (!list.includes(value)) {
+      const updated = [value, ...list.filter(v => !defaults.includes(v))].slice(0, 20);
+      localStorage.setItem(key, JSON.stringify(updated));
+    }
+    refreshLinkDatalist();
+  }
+  function refreshLinkDatalist() {
+    const years = getLinkMemory('linkYears', DEFAULT_YEARS);
+    const plans = getLinkMemory('linkPlans', DEFAULT_PLANS);
+    document.getElementById('yearSuggestions').innerHTML = years.map(y => `<option value="${y}">`).join('');
+    document.getElementById('planSuggestions').innerHTML = plans.map(p => `<option value="${p}">`).join('');
+  }
+
   function openLinkModal() {
     document.getElementById('linkYear').value  = '';
     document.getElementById('linkPlan').value  = '';
     document.getElementById('linkOutput').style.display = 'none';
     document.getElementById('copyBtn').style.display    = 'none';
+    refreshLinkDatalist();
     document.getElementById('linkModal').classList.add('show');
     document.getElementById('linkYear').focus();
   }
@@ -1267,8 +1293,13 @@
     btn.style.display = 'block';
   }
   function copyRegLink() {
+    const year = document.getElementById('linkYear').value.trim();
+    const plan = document.getElementById('linkPlan').value.trim();
     const text = document.getElementById('linkOutput').textContent;
     navigator.clipboard.writeText(text).then(() => {
+      // 記住用過的年度和方案
+      saveLinkMemory('linkYears', year, DEFAULT_YEARS);
+      saveLinkMemory('linkPlans', plan, DEFAULT_PLANS);
       const btn = document.getElementById('copyBtn');
       btn.textContent = '✅ 已複製！';
       setTimeout(() => { btn.textContent = '複製連結'; }, 2000);
