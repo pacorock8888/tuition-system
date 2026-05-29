@@ -1591,7 +1591,7 @@
     reader.onload = function(e) {
       const wb      = XLSX.read(e.target.result, { type: 'array' });
       const sheet   = wb.Sheets[wb.SheetNames[0]];
-      const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
       if (rawRows.length < 2) return alert('檔案內容太少，請確認格式');
 
       const headers = rawRows[0].map(String);
