@@ -61,6 +61,22 @@
       cursor: pointer; border: 1.5px solid #e5e5ea; background: #1c1c1e; color: white;
       margin-left: auto;
     }
+    .link-btn {
+      padding: 9px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #007aff; background: #007aff; color: white;
+      margin-left: 8px;
+    }
+    .link-output {
+      background: #f2f2f7; border-radius: 10px; padding: 12px 14px;
+      font-size: 13px; color: #1c1c1e; word-break: break-all; line-height: 1.5;
+      margin-top: 12px; display: none;
+    }
+    .copy-btn {
+      width: 100%; padding: 12px; background: #34c759; color: white;
+      border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+      cursor: pointer; margin-top: 10px; font-family: inherit;
+    }
+    .copy-btn:active { opacity: 0.8; }
 
     /* ── Tile Grid ── */
     .tile-grid {
@@ -296,6 +312,7 @@
       <button class="filter-btn"       onclick="setFilter('paid',this)">已繳</button>
       <button class="filter-btn"       onclick="setFilter('inactive',this)">不續班</button>
       <button class="import-btn"       onclick="openImportModal()">📥 匯入成績</button>
+      <button class="link-btn"         onclick="openLinkModal()">🔗 產生連結</button>
     </div>
     <div class="tile-grid" id="tileGrid"><div class="loading">載入中…</div></div>
   </div>
@@ -483,6 +500,29 @@
       <div id="payHistory"><div style="color:#8e8e93;font-size:13px">載入中…</div></div>
     </div>
 
+  </div>
+</div>
+
+<!-- Link Generator Modal -->
+<div class="modal-overlay" id="linkModal" onclick="if(event.target===this)closeLinkModal()">
+  <div class="modal-box">
+    <div class="modal-title">
+      <span>🔗 產生報名連結</span>
+      <button onclick="closeLinkModal()">✕</button>
+    </div>
+    <div class="modal-scroll">
+      <div class="form-field">
+        <label>學費年度</label>
+        <input type="text" id="linkYear" placeholder="例：116、117" oninput="updateLinkOutput()">
+      </div>
+      <div class="form-field">
+        <label>課程方案名稱</label>
+        <input type="text" id="linkPlan" placeholder="例：四個月9600" oninput="updateLinkOutput()">
+        <div style="font-size:12px;color:#8e8e93;margin-top:4px">學生填表時會看到這個方案名稱，無法修改</div>
+      </div>
+      <div class="link-output" id="linkOutput"></div>
+      <button class="copy-btn" id="copyBtn" onclick="copyRegLink()" style="display:none">複製連結</button>
+    </div>
   </div>
 </div>
 
@@ -1198,6 +1238,41 @@
 
   function onImportOverlayClick(e) {
     if (e.target === document.getElementById('importModal')) closeImportModal();
+  }
+
+  // ── 報名連結產生器 ──
+  function openLinkModal() {
+    document.getElementById('linkYear').value  = '';
+    document.getElementById('linkPlan').value  = '';
+    document.getElementById('linkOutput').style.display = 'none';
+    document.getElementById('copyBtn').style.display    = 'none';
+    document.getElementById('linkModal').classList.add('show');
+    document.getElementById('linkYear').focus();
+  }
+  function closeLinkModal() {
+    document.getElementById('linkModal').classList.remove('show');
+  }
+  function updateLinkOutput() {
+    const year = document.getElementById('linkYear').value.trim();
+    const plan = document.getElementById('linkPlan').value.trim();
+    const out  = document.getElementById('linkOutput');
+    const btn  = document.getElementById('copyBtn');
+    if (!year && !plan) { out.style.display = 'none'; btn.style.display = 'none'; return; }
+    const base = 'https://pacorock8888.github.io/tuition-system/register.html';
+    const qs   = [];
+    if (year) qs.push('year=' + encodeURIComponent(year));
+    if (plan) qs.push('plan=' + encodeURIComponent(plan));
+    out.textContent = base + (qs.length ? '?' + qs.join('&') : '');
+    out.style.display = 'block';
+    btn.style.display = 'block';
+  }
+  function copyRegLink() {
+    const text = document.getElementById('linkOutput').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✅ 已複製！';
+      setTimeout(() => { btn.textContent = '複製連結'; }, 2000);
+    });
   }
 
   function parseImportFile() {

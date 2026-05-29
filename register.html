@@ -15,37 +15,12 @@
       padding: 32px 16px 48px;
     }
 
-    .container {
-      max-width: 560px;
-      margin: 0 auto;
-    }
+    .container { max-width: 560px; margin: 0 auto; }
 
-    header {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-
-    header .brand {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      color: #8e8e93;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-
-    header h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #1c1c1e;
-    }
-
-    header p {
-      font-size: 14px;
-      color: #6c6c70;
-      margin-top: 8px;
-      line-height: 1.6;
-    }
+    header { text-align: center; margin-bottom: 28px; }
+    header .brand { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; color: #8e8e93; text-transform: uppercase; margin-bottom: 6px; }
+    header h1 { font-size: 24px; font-weight: 700; color: #1c1c1e; }
+    header p { font-size: 14px; color: #6c6c70; margin-top: 8px; line-height: 1.6; }
 
     .card {
       background: white;
@@ -62,24 +37,14 @@
       color: #8e8e93;
       margin: 24px 0 16px;
     }
-
     .section-title:first-child { margin-top: 0; }
 
-    .field {
-      margin-bottom: 16px;
-    }
+    .field { margin-bottom: 16px; }
 
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #3a3a3c;
-      margin-bottom: 6px;
-    }
-
+    label { display: block; font-size: 13px; font-weight: 600; color: #3a3a3c; margin-bottom: 6px; }
     label .req { color: #ff3b30; margin-left: 2px; }
 
-    input, select, textarea {
+    input[type="text"], textarea {
       width: 100%;
       padding: 12px 14px;
       border: 1.5px solid #e5e5ea;
@@ -92,33 +57,22 @@
       -webkit-appearance: none;
       appearance: none;
     }
-
-    select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238e8e93' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      padding-right: 36px;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #007aff;
-    }
-
+    input[type="text"]:focus, textarea:focus { outline: none; border-color: #007aff; }
     input::placeholder, textarea::placeholder { color: #c7c7cc; }
-
     textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 
-    .hint {
-      font-size: 12px;
-      color: #8e8e93;
-      margin-top: 4px;
-    }
+    .hint { font-size: 12px; color: #8e8e93; margin-top: 4px; }
+    .divider { height: 1px; background: #f2f2f7; margin: 20px 0; }
 
-    .divider {
-      height: 1px;
-      background: #f2f2f7;
-      margin: 20px 0;
+    /* 預設方案顯示 */
+    .preset-chip {
+      background: #f0f6ff;
+      border: 1.5px solid #007aff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #007aff;
     }
 
     .submit-btn {
@@ -135,7 +89,6 @@
       transition: opacity 0.15s;
       font-family: inherit;
     }
-
     .submit-btn:hover { opacity: 0.85; }
     .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -150,43 +103,17 @@
       margin-top: 12px;
     }
 
-    /* 成功頁面 */
-    .success-view {
-      display: none;
-      text-align: center;
-      padding: 40px 24px;
-    }
+    .success-view { display: none; text-align: center; padding: 40px 24px; }
+    .success-icon { font-size: 56px; line-height: 1; margin-bottom: 16px; }
+    .success-view h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+    .success-view p { font-size: 14px; color: #6c6c70; line-height: 1.7; }
 
-    .success-icon {
-      font-size: 56px;
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-
-    .success-view h2 {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .success-view p {
-      font-size: 14px;
-      color: #6c6c70;
-      line-height: 1.7;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #c7c7cc;
-    }
+    footer { text-align: center; margin-top: 20px; font-size: 12px; color: #c7c7cc; }
   </style>
 </head>
 <body>
 
 <div class="container">
-
   <header>
     <div class="brand">巨石玩理</div>
     <h1>線上課程報名</h1>
@@ -194,8 +121,6 @@
   </header>
 
   <div class="card">
-
-    <!-- 報名表單 -->
     <form id="regForm">
 
       <div class="section-title">學生資料</div>
@@ -210,16 +135,6 @@
         <input type="text" name="school" placeholder="例：○○國中" required>
       </div>
 
-      <div class="field">
-        <label>就讀年級 <span class="req">*</span></label>
-        <select name="grade" required>
-          <option value="">請選擇</option>
-          <option value="七年級（國一）">七年級（國一）</option>
-          <option value="八年級（國二）">八年級（國二）</option>
-          <option value="九年級（國三）">九年級（國三）</option>
-        </select>
-      </div>
-
       <div class="divider"></div>
       <div class="section-title">聯絡資料</div>
 
@@ -231,21 +146,14 @@
 
       <div class="field">
         <label>居住地址 <span class="req">*</span></label>
-        <input type="text" name="address" placeholder="縣市區里路號" required>
+        <input type="text" name="address" placeholder="縣市區路號" required>
       </div>
 
       <div class="divider"></div>
       <div class="section-title">課程選擇</div>
 
-      <div class="field">
-        <label>課程方案 <span class="req">*</span></label>
-        <select name="course_type" required>
-          <option value="">請選擇</option>
-          <!-- ★ 請依當期收費方案調整以下選項 ★ -->
-          <option value="四個月10800">四個月方案｜$10,800</option>
-          <option value="六個月15600">六個月方案｜$15,600</option>
-        </select>
-        <div class="hint">選擇後老師會再確認實際開課月份</div>
+      <div class="field" id="planField">
+        <!-- 由 JS 動態填入 -->
       </div>
 
       <div class="field">
@@ -253,61 +161,67 @@
         <textarea name="notes" placeholder="任何補充說明，例如：希望的上課時段、先前學習狀況等"></textarea>
       </div>
 
-      <div id="errorBanner" class="error-banner">
-        送出失敗，請重試或直接聯繫 PACO 老師。
-      </div>
-
+      <div id="errorBanner" class="error-banner">送出失敗，請重試或直接聯繫 PACO 老師。</div>
       <button type="submit" class="submit-btn" id="submitBtn">送出報名</button>
-
     </form>
 
-    <!-- 成功頁面（送出後顯示） -->
     <div class="success-view" id="successView">
       <div class="success-icon">✅</div>
       <h2>報名成功！</h2>
       <p>PACO 老師已收到您的報名資訊。<br>將盡快透過 LINE 聯繫您確認課程安排。</p>
     </div>
-
   </div>
 
   <footer>巨石玩理 · PACO 老師線上理化課程</footer>
-
 </div>
 
 <script>
-  // ★ 請將下方的網址替換成你部署好的 Google Apps Script 網址 ★
   const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7D_7xj3xe3S_ejL58oOGO2AMc70gMXBAtgbnkmrKqsPL3KxMaz9IlyFk6jMPyBjKRmQ/exec';
 
-  // 目前學費年度（每年新學期開始前更新）
-  const TUITION_YEAR = '116';
+  // 讀取 URL 參數
+  const params = new URLSearchParams(window.location.search);
+  const yearParam  = params.get('year')  || '';
+  const planParam  = params.get('plan')  || '';
 
-  document.getElementById('regForm').addEventListener('submit', async function (e) {
+  // 課程方案欄位：有帶參數就鎖定，否則讓學生自填
+  const planField = document.getElementById('planField');
+  if (planParam) {
+    planField.innerHTML = `
+      <label>課程方案</label>
+      <div class="preset-chip">${planParam}</div>
+      <input type="hidden" name="course_type" value="${planParam}">
+      <div class="hint">課程方案由老師預先設定</div>
+    `;
+  } else {
+    planField.innerHTML = `
+      <label>課程方案 <span class="req">*</span></label>
+      <input type="text" name="course_type" placeholder="請填寫課程方案（由老師告知）" required>
+    `;
+  }
+
+  document.getElementById('regForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
     const btn = document.getElementById('submitBtn');
     const errorBanner = document.getElementById('errorBanner');
-
     btn.disabled = true;
     btn.textContent = '送出中…';
     errorBanner.style.display = 'none';
 
     const raw = new FormData(this);
-    const payload = { tuition_year: TUITION_YEAR };
-    raw.forEach((val, key) => { payload[key] = val.trim(); });
+    const payload = { tuition_year: yearParam || '116' };
+    raw.forEach((val, key) => { payload[key] = val.trim ? val.trim() : val; });
     payload.submitted_at = new Date().toISOString();
 
     try {
       await fetch(SCRIPT_URL, {
         method: 'POST',
-        mode: 'no-cors', // Google Apps Script 限制，無法讀取回應內容
+        mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-
-      // no-cors 無法讀取 response，fetch 未拋出錯誤即視為成功
       document.getElementById('regForm').style.display = 'none';
       document.getElementById('successView').style.display = 'block';
-
     } catch (err) {
       errorBanner.style.display = 'block';
       btn.disabled = false;
