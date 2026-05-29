@@ -414,7 +414,28 @@
       <div id="scoreForm" class="sub-form hidden">
         <div class="form-field">
           <label>考試名稱</label>
-          <input type="text" id="scoreExamName" placeholder="例：二下二段考">
+          <select id="scoreExamName">
+            <option value="">請選擇</option>
+            <optgroup label="國二上">
+              <option>二上一段考</option>
+              <option>二上二段考</option>
+              <option>二上三段考</option>
+            </optgroup>
+            <optgroup label="國二下">
+              <option>二下一段考</option>
+              <option>二下二段考</option>
+              <option>二下三段考</option>
+            </optgroup>
+            <optgroup label="國三上">
+              <option>三上一段考</option>
+              <option>三上二段考</option>
+              <option>三上三段考</option>
+            </optgroup>
+            <optgroup label="國三下">
+              <option>三下一段考</option>
+              <option>三下二段考</option>
+            </optgroup>
+          </select>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div class="form-field">
@@ -537,8 +558,29 @@
     </div>
     <div class="modal-scroll">
       <div class="form-field">
-        <label>考試名稱（例：二下二段考）</label>
-        <input type="text" id="importExamName" placeholder="填完後匯入資料才能計算">
+        <label>考試名稱</label>
+        <select id="importExamName">
+          <option value="">請選擇</option>
+          <optgroup label="國二上">
+            <option>二上一段考</option>
+            <option>二上二段考</option>
+            <option>二上三段考</option>
+          </optgroup>
+          <optgroup label="國二下">
+            <option>二下一段考</option>
+            <option>二下二段考</option>
+            <option>二下三段考</option>
+          </optgroup>
+          <optgroup label="國三上">
+            <option>三上一段考</option>
+            <option>三上二段考</option>
+            <option>三上三段考</option>
+          </optgroup>
+          <optgroup label="國三下">
+            <option>三下一段考</option>
+            <option>三下二段考</option>
+          </optgroup>
+        </select>
       </div>
       <div class="form-field">
         <label>上傳 Excel 檔案（.xlsx）</label>
