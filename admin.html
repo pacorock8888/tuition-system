@@ -1620,6 +1620,14 @@
     reader.readAsArrayBuffer(file);
   }
 
+  function safeParseScore(val) {
+    if (val === null || val === undefined || val === '') return NaN;
+    const s = String(val).trim();
+    // 日期格式字串（如 3/15/2026、2026-03-15）→ 無效，回傳 NaN
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(s) || /^\d{4}-\d{2}-\d{2}/.test(s)) return NaN;
+    return parseFloat(s);
+  }
+
   function showImportPreview() {
     if (!_importRows.length) return;
     const nameCol    = parseInt(document.getElementById('colName').value);
@@ -1630,9 +1638,9 @@
 
     const processed = _importRows.map(row => {
       const name    = String(row[nameCol] || '').trim();
-      const cur     = parseFloat(row[curCol]);
-      const prev    = prevCol !== null ? parseFloat(row[prevCol]) : null;
-      const matched = allStudents.find(s => s['學生姓名'] === name && s['學費年度'] === importYear);
+      const cur     = safeParseScore(row[curCol]);
+      const prev    = prevCol !== null ? safeParseScore(row[prevCol]) : null;
+      const matched = allStudents.find(s => s['學生姓名'] === name && String(s['學費年度']) === String(importYear));
       const scholarship = !isNaN(cur) ? calcScholarshipAmount(cur, prev !== null && !isNaN(prev) ? prev : null) : 0;
       return { name, cur, prev, matched: !!matched, matchedId: matched?.['id'], scholarship };
     }).filter(r => r.name);
