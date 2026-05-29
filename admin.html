@@ -546,7 +546,8 @@
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-shrink:0">
       <input type="text" id="listSearch" placeholder="搜尋姓名…" oninput="renderListTable()"
         style="flex:1;padding:8px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
-      <button onclick="copyAllAddresses()" style="padding:8px 14px;background:#5856d6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">複製地址</button>
+      <button onclick="copyPostOfficeFormat()" style="padding:8px 14px;background:#ff9500;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">📮 郵局格式</button>
+      <button onclick="copyAllAddresses()" style="padding:8px 14px;background:#5856d6;color:white;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap">複製全部</button>
     </div>
     <div class="modal-scroll">
       <table class="list-table">
@@ -1386,6 +1387,20 @@
       .filter(s => !kw || s['學生姓名'].toLowerCase().includes(kw));
     const text = list.map(s => `${s['學生姓名']}\t${s['家長電話']||''}\t${s['地址']||''}`).join('\n');
     navigator.clipboard.writeText(text).then(() => alert(`✅ 已複製 ${list.length} 筆資料`));
+  }
+
+  function copyPostOfficeFormat() {
+    const kw   = document.getElementById('listSearch').value.toLowerCase();
+    const list = allStudents
+      .filter(s => s['學費年度'] === currentYear && getStatus(s) !== 'inactive')
+      .filter(s => !kw || s['學生姓名'].toLowerCase().includes(kw));
+    // 格式：收件人姓名 \t 收件人電話 \t 寄達地址類型 \t 收件地址
+    const text = list.map(s =>
+      `${s['學生姓名']}\t${s['家長電話']||''}\t一般地址\t${s['地址']||''}`
+    ).join('\n');
+    navigator.clipboard.writeText(text).then(() =>
+      alert(`✅ 已複製 ${list.length} 筆（郵局格式）\n\n貼到郵局 Excel 的第一筆資料欄位即可。`)
+    );
   }
 
   // ── 匯出 Excel ──
