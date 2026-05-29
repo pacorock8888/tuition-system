@@ -127,7 +127,8 @@
 
       <div class="field">
         <label>學生姓名 <span class="req">*</span></label>
-        <input type="text" name="student_name" placeholder="請填寫學生本名" required>
+        <input type="text" name="student_name" placeholder="請填寫學生全名（例：王小明）" required>
+        <div class="hint">⚠️ 請務必填寫完整全名，勿只填名字</div>
       </div>
 
       <div class="field">
@@ -139,9 +140,15 @@
       <div class="section-title">聯絡資料</div>
 
       <div class="field">
+        <label>家長姓名 <span class="req">*</span></label>
+        <input type="text" name="parent_name" placeholder="請填寫家長全名（例：王大明）" required>
+        <div class="hint">⚠️ 請務必填寫完整全名</div>
+      </div>
+
+      <div class="field">
         <label>家長聯絡方式（電話 / LINE ID）<span class="req">*</span></label>
         <input type="text" name="phone" placeholder="電話號碼或 LINE ID" required>
-        <div class="hint">填其中一個即可，或兩個都填（例：0912-345-678 / lineID）</div>
+        <div class="hint">填其中一個即可，或兩個都填（例：0912345678 / lineID）</div>
       </div>
 
       <div class="field">
