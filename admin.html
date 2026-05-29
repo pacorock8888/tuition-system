@@ -1389,6 +1389,14 @@
     navigator.clipboard.writeText(text).then(() => alert(`✅ 已複製 ${list.length} 筆資料`));
   }
 
+  function cleanPhone(raw) {
+    // 只保留開頭的連續數字（去掉後面可能夾雜的 LINE ID 等文字）
+    const digits = String(raw || '').trim().replace(/^(\d+).*/, '$1');
+    // 台灣手機 09 開頭，若存成 9 碼（少了開頭 0）就補回來
+    if (digits.length === 9 && digits.startsWith('9')) return '0' + digits;
+    return digits;
+  }
+
   function copyPostOfficeFormat() {
     const kw   = document.getElementById('listSearch').value.toLowerCase();
     const list = allStudents
@@ -1396,7 +1404,7 @@
       .filter(s => !kw || s['學生姓名'].toLowerCase().includes(kw));
     // 格式：收件人姓名 \t 收件人電話 \t 寄達地址類型 \t 收件地址
     const text = list.map(s =>
-      `${s['學生姓名']}\t${s['家長電話']||''}\t一般地址\t${s['地址']||''}`
+      `${s['學生姓名']}\t${cleanPhone(s['家長電話'])}\t一般地址\t${s['地址']||''}`
     ).join('\n');
     navigator.clipboard.writeText(text).then(() =>
       alert(`✅ 已複製 ${list.length} 筆（郵局格式）\n\n貼到郵局 Excel 的第一筆資料欄位即可。`)
