@@ -1444,9 +1444,9 @@
     if (!examName) return alert('請填入考試名稱');
 
     const toImport = (window._importPreview || []).filter(r => r.matched).map(r => ({
-      id:   r.matchedId,
-      cur:  r.cur,
-      prev: r.prev !== null && !isNaN(r.prev) ? r.prev : ''
+      student_id:    r.matchedId,
+      current_score: r.cur,
+      prev_score:    r.prev !== null && !isNaN(r.prev) ? r.prev : ''
     }));
     if (!toImport.length) return;
 
