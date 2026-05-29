@@ -1597,19 +1597,46 @@
       const headers = rawRows[0].map(String);
       _importRows   = rawRows.slice(1).filter(r => r.some(c => c !== ''));
 
+      // ── 智慧自動偵測欄位 ──
+      const nameColGuess = headers.findIndex(h =>
+        String(h).includes('姓名') || String(h).includes('名字'));
+
+      // 時間戳記、email 等非成績欄一律跳過
+      const skipKw = ['時間', 'timestamp', 'stamp', 'email', '電子郵件', '電話', '地址'];
+      const isSkip = h => skipKw.some(k => String(h).toLowerCase().includes(k));
+
+      // 找分數欄：1）欄位名稱關鍵字 2）掃資料內容（值介於 0–100）
+      const scoreNameKw = ['分數', '成績', '得分', '當次', '本次', '一段', '二段', '三段'];
+      const findScoreCol = excludeIdx => {
+        let idx = headers.findIndex((h, i) =>
+          i !== excludeIdx && !isSkip(h) && scoreNameKw.some(k => String(h).includes(k)));
+        if (idx >= 0) return idx;
+        const sample = _importRows.slice(0, Math.min(5, _importRows.length));
+        for (let i = 0; i < headers.length; i++) {
+          if (i === excludeIdx || i === nameColGuess || isSkip(headers[i])) continue;
+          const nums = sample
+            .map(r => parseFloat(String(r[i] || '')))
+            .filter(v => !isNaN(v) && v >= 0 && v <= 100);
+          if (nums.length >= Math.min(3, sample.length)) return i;
+        }
+        return 0;
+      };
+      const curColGuess  = findScoreCol(-1);
+      const prevNameKw   = ['前次', '上次', '上一段'];
+      const prevColGuess = headers.findIndex((h, i) =>
+        i !== curColGuess && prevNameKw.some(k => String(h).includes(k)));
+
       // 填入欄位選單
       ['colName', 'colCurrent', 'colPrev'].forEach(id => {
         const sel = document.getElementById(id);
-        const prevVal = sel.value;
         sel.innerHTML = id === 'colPrev' ? '<option value="">不選</option>' : '';
         headers.forEach((h, i) => {
           const opt = document.createElement('option');
           opt.value = i;
           opt.textContent = h || `欄 ${i + 1}`;
-          // 自動猜測
-          if (id === 'colName'    && (h.includes('姓名') || h.includes('名字')))    opt.selected = true;
-          if (id === 'colCurrent' && h.includes('二段'))                              opt.selected = true;
-          if (id === 'colPrev'    && h.includes('一段'))                              opt.selected = true;
+          if (id === 'colName'    && i === nameColGuess)  opt.selected = true;
+          if (id === 'colCurrent' && i === curColGuess)   opt.selected = true;
+          if (id === 'colPrev'    && i === prevColGuess)  opt.selected = true;
           sel.appendChild(opt);
         });
       });
