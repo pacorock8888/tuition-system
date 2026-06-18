@@ -559,6 +559,10 @@
       <div id="payHistory"><div style="color:#8e8e93;font-size:13px">載入中…</div></div>
     </div>
 
+    <div class="panel-section" style="border-top:1px solid #f2f2f7;padding-top:16px;margin-top:4px">
+      <button class="panel-btn btn-red" style="width:100%;opacity:0.7" onclick="handleDeleteStudent()">🗑️ 刪除此學生資料</button>
+    </div>
+
   </div>
 </div>
 
@@ -905,6 +909,20 @@
       if (s) s['繳費狀態'] = '不續班';
       renderReviewGrid();
       closeDetail();
+    }
+  }
+
+  async function handleDeleteStudent() {
+    const s = allStudents.find(x => x['id'] === currentStudentId);
+    const name = s?.['學生姓名'] || '此學生';
+    if (!confirm(`確定要刪除「${name}」的所有資料？\n\n此操作無法復原。`)) return;
+    const json = await apiGet({ action: 'deleteStudent', student_id: currentStudentId });
+    if (json.status === 'success' && json.data?.deleted) {
+      allStudents = allStudents.filter(x => x['id'] !== currentStudentId);
+      renderGrid();
+      closeDetail();
+    } else {
+      alert('刪除失敗：' + (json.data?.message || json.message || '未知錯誤'));
     }
   }
 
