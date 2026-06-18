@@ -912,6 +912,17 @@
     }
   }
 
+  async function deletePayRecord(encodedTime) {
+    if (!confirm('確定刪除這筆繳費紀錄？')) return;
+    const recordTime = decodeURIComponent(encodedTime);
+    const json = await apiGet({ action: 'deletePaymentRecord', student_id: currentStudentId, record_time: recordTime });
+    if (json.status === 'success' && json.data?.deleted) {
+      loadPayHistory(currentStudentId);
+    } else {
+      alert('刪除失敗：' + (json.data?.message || '未知錯誤'));
+    }
+  }
+
   async function handleDeleteStudent() {
     const s = allStudents.find(x => x['id'] === currentStudentId);
     const name = s?.['學生姓名'] || '此學生';
@@ -1261,16 +1272,20 @@
         return;
       }
       div.innerHTML = json.data.map(h => {
-        const sc = h['狀態'] === '已繳' ? 'badge-paid' : 'badge-pending';
+        const sc  = h['狀態'] === '已繳' ? 'badge-paid' : 'badge-pending';
+        const rt  = encodeURIComponent(h['紀錄時間'] || '');
         return `
-          <div class="hist-row">
+          <div class="hist-row" style="align-items:center">
             <div>
               <div class="hist-date">${h['繳費月份'] || '—'}</div>
               <div class="hist-plan">${h['學費年度'] ? h['學費年度'] + '年度' : ''}</div>
             </div>
-            <div style="text-align:right">
-              <div style="font-weight:600">${h['金額'] ? '$' + Number(h['金額']).toLocaleString() : '—'}</div>
-              <span class="hist-status ${sc}">${h['狀態']}</span>
+            <div style="text-align:right;display:flex;align-items:center;gap:8px">
+              <div>
+                <div style="font-weight:600">${h['金額'] ? '$' + Number(h['金額']).toLocaleString() : '—'}</div>
+                <span class="hist-status ${sc}">${h['狀態']}</span>
+              </div>
+              <button onclick="deletePayRecord('${rt}')" style="background:none;border:none;color:#ff3b30;font-size:16px;cursor:pointer;padding:4px;line-height:1" title="刪除此筆紀錄">🗑️</button>
             </div>
           </div>
         `;
