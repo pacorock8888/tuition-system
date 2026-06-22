@@ -387,10 +387,43 @@
 
     <!-- 聯絡資料 -->
     <div class="panel-section">
-      <div class="section-title">聯絡資料</div>
-      <div class="info-row"><span class="info-icon">📱</span><span class="info-val" id="pPhone"></span></div>
-      <div class="info-row"><span class="info-icon">🏠</span><span class="info-val" id="pAddress"></span></div>
-      <div class="info-row"><span class="info-icon">💬</span><span class="info-val" id="pLine"></span></div>
+      <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+        聯絡資料
+        <button onclick="toggleEditInfo()" id="editInfoBtn" style="background:none;border:1.5px solid #007aff;color:#007aff;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:600;cursor:pointer">編輯</button>
+      </div>
+      <!-- 顯示模式 -->
+      <div id="infoDisplay">
+        <div class="info-row"><span class="info-icon">📱</span><span class="info-val" id="pPhone"></span></div>
+        <div class="info-row"><span class="info-icon">🏠</span><span class="info-val" id="pAddress"></span></div>
+        <div class="info-row"><span class="info-icon">💬</span><span class="info-val" id="pLine"></span></div>
+      </div>
+      <!-- 編輯模式 -->
+      <div id="infoEditForm" style="display:none">
+        <div class="form-field" style="margin-bottom:10px">
+          <label style="font-size:12px;color:#8e8e93;margin-bottom:4px;display:block">學生姓名</label>
+          <input type="text" id="editName" style="width:100%;padding:9px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="form-field" style="margin-bottom:10px">
+          <label style="font-size:12px;color:#8e8e93;margin-bottom:4px;display:block">家長電話</label>
+          <input type="text" id="editPhone" style="width:100%;padding:9px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="form-field" style="margin-bottom:10px">
+          <label style="font-size:12px;color:#8e8e93;margin-bottom:4px;display:block">LINE ID</label>
+          <input type="text" id="editLine" style="width:100%;padding:9px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="form-field" style="margin-bottom:10px">
+          <label style="font-size:12px;color:#8e8e93;margin-bottom:4px;display:block">地址</label>
+          <input type="text" id="editAddress" style="width:100%;padding:9px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+        </div>
+        <div class="form-field" style="margin-bottom:10px">
+          <label style="font-size:12px;color:#8e8e93;margin-bottom:4px;display:block">備註</label>
+          <input type="text" id="editNotes" style="width:100%;padding:9px 12px;border:1.5px solid #e5e5ea;border-radius:8px;font-size:14px;font-family:inherit">
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="saveEditInfo()" class="panel-btn btn-blue" style="flex:1">儲存</button>
+          <button onclick="toggleEditInfo()" class="panel-btn btn-gray" style="flex:1">取消</button>
+        </div>
+      </div>
     </div>
 
     <!-- 本期資料（進度班）-->
@@ -909,6 +942,47 @@
       if (s) s['繳費狀態'] = '不續班';
       renderReviewGrid();
       closeDetail();
+    }
+  }
+
+  function toggleEditInfo() {
+    const s = allStudents.find(x => x['id'] === currentStudentId);
+    const isEdit = document.getElementById('infoEditForm').style.display !== 'none';
+    if (isEdit) {
+      document.getElementById('infoEditForm').style.display = 'none';
+      document.getElementById('infoDisplay').style.display  = '';
+      document.getElementById('editInfoBtn').textContent    = '編輯';
+    } else {
+      document.getElementById('editName').value    = s?.['學生姓名']  || '';
+      document.getElementById('editPhone').value   = s?.['家長電話']  || '';
+      document.getElementById('editLine').value    = s?.['LINE ID']   || '';
+      document.getElementById('editAddress').value = s?.['地址']      || '';
+      document.getElementById('editNotes').value   = s?.['備註']      || '';
+      document.getElementById('infoDisplay').style.display  = 'none';
+      document.getElementById('infoEditForm').style.display = '';
+      document.getElementById('editInfoBtn').textContent    = '取消';
+    }
+  }
+
+  async function saveEditInfo() {
+    const fields = {
+      '學生姓名': document.getElementById('editName').value.trim(),
+      '家長電話': document.getElementById('editPhone').value.trim(),
+      'LINE ID':  document.getElementById('editLine').value.trim(),
+      '地址':     document.getElementById('editAddress').value.trim(),
+      '備註':     document.getElementById('editNotes').value.trim(),
+    };
+    const json = await apiGet({ action: 'updateStudent', student_id: currentStudentId, fields: JSON.stringify(fields) });
+    if (json.status === 'success' && json.data?.updated) {
+      const s = allStudents.find(x => x['id'] === currentStudentId);
+      if (s) Object.assign(s, fields);
+      document.getElementById('pPhone').textContent   = fields['家長電話'] || '—';
+      document.getElementById('pAddress').textContent = fields['地址']     || '—';
+      document.getElementById('pLine').textContent    = fields['LINE ID']  || '—';
+      document.getElementById('pName').textContent    = fields['學生姓名'] || '—';
+      toggleEditInfo();
+    } else {
+      alert('儲存失敗：' + (json.data?.message || '未知錯誤'));
     }
   }
 
