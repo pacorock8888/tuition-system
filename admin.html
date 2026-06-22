@@ -1661,11 +1661,14 @@
       '備註':     s['備註'] || ''
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
-    // 把「家長電話」欄設成文字格式，避免開頭的 0 被 Excel 吃掉
-    const phoneCol = 'C'; // 第3欄
+    // 把「家長電話」欄強制改回文字，補回被 Excel 吃掉的開頭 0
     for (let r = 2; r <= rows.length + 1; r++) {
-      const cell = ws[`${phoneCol}${r}`];
-      if (cell) { cell.t = 's'; cell.z = '@'; }
+      const cell = ws[`C${r}`];
+      if (!cell) continue;
+      const original = String(rows[r - 2]['家長電話'] || '');
+      cell.t = 's';
+      cell.v = original;
+      delete cell.w; // 清除 SheetJS 快取的顯示值
     }
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, `${currentYear}年度學生`);
