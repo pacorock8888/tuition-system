@@ -18,7 +18,7 @@
 //    類型：網頁應用程式
 //    執行身分：我（你的帳號）
 //    誰可以存取：所有人
-//    → 複製產生的網址，貼到 register.html 和 admin.html 的 SCRIPT_URL 位置
+//    → 複製產生的網址，貼到公開報名表單的 SCRIPT_URL 位置
 //
 // ============================================================
 
@@ -61,6 +61,14 @@ function doPost(e) {
 // ============================================================
 
 function doGet(e) {
+  // 公開報名部署只允許 doPost 新增資料；所有 GET 管理請求一律拒絕。
+  var publicOutput = ContentService.createTextOutput(JSON.stringify({
+    status: 'error',
+    message: '此公開入口僅供報名，管理功能已關閉'
+  }));
+  publicOutput.setMimeType(ContentService.MimeType.JSON);
+  return publicOutput;
+
   var action = e.parameter.action || '';
   var token  = e.parameter.token  || '';
   var output = ContentService.createTextOutput();
@@ -580,7 +588,6 @@ function getAdminToken() {
   return PropertiesService.getScriptProperties().getProperty('ADMIN_TOKEN');
 }
 
-// 想修改後台密碼時，改這裡的字串再執行一次
 function setAdminToken() {
   throw new Error('管理密碼只可寫入 Apps Script 屬性，不可寫進程式碼');
 }
