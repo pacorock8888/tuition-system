@@ -197,12 +197,14 @@
   // 課程方案欄位：有帶參數就鎖定，否則讓學生自填
   const planField = document.getElementById('planField');
   if (planParam) {
-    planField.innerHTML = `
-      <label>課程方案</label>
-      <div class="preset-chip">${planParam}</div>
-      <input type="hidden" name="course_type" value="${planParam}">
-      <div class="hint">課程方案由老師預先設定</div>
-    `;
+    const label = document.createElement('label');
+    label.textContent = '課程方案';
+    const chip = document.createElement('div'); chip.className = 'preset-chip';
+    const matched = planParam.match(/^(四個月|六個月)(\d+)$/);
+    chip.textContent = matched ? `${matched[1] === '四個月' ? 4 : 6} 個月｜$${Number(matched[2]).toLocaleString()}` : planParam;
+    const hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = 'course_type'; hidden.value = planParam;
+    const hint = document.createElement('div'); hint.className = 'hint'; hint.textContent = '課程方案由老師預先設定';
+    planField.replaceChildren(label, chip, hidden, hint);
   } else {
     planField.innerHTML = `
       <label>課程方案 <span class="req">*</span></label>
