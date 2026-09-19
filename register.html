@@ -120,6 +120,9 @@
     .success-icon { font-size: 56px; line-height: 1; margin-bottom: 16px; }
     .success-view h2 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
     .success-view p { font-size: 14px; color: #6c6c70; line-height: 1.7; }
+    .community-link { display: block; margin-top: 20px; padding: 15px; border-radius: 12px; background: #07883f; color: white; font-size: 16px; font-weight: 600; text-decoration: none; }
+    .community-link:hover { background: #066e34; }
+    .community-link[hidden] { display: none; }
 
     footer { text-align: center; margin-top: 20px; font-size: 12px; color: #c7c7cc; }
   </style>
@@ -207,6 +210,8 @@
       <div class="success-icon">✅</div>
       <h2>報名成功！</h2>
       <p>PACO 老師已收到您的報名資訊。<br>將盡快透過 LINE 聯繫您確認課程安排。</p>
+      <p id="communityHint" style="margin-top:16px"></p>
+      <a id="communityLink" class="community-link" target="_blank" rel="noopener noreferrer" hidden></a>
     </div>
   </div>
 
@@ -222,6 +227,26 @@
   const params = new URLSearchParams(window.location.search);
   const yearParam  = params.get('year')  || '';
   const planParam  = params.get('plan')  || '';
+
+  function showRegistrationSuccess() {
+    const communityUrls = new Map([
+      ['116', 'https://pacorock8888.github.io/line-community-link/116/'],
+      ['117', 'https://pacorock8888.github.io/line-community-link/117/']
+    ]);
+    const url = communityUrls.get(yearParam);
+    const link = document.getElementById('communityLink');
+    document.getElementById('communityHint').textContent = url
+      ? '下一步，請加入班級社群，接收課程通知與後續安排。'
+      : '請聯繫 PACO 老師取得班級社群連結。';
+    if (url) {
+      link.href = url;
+      link.textContent = `加入 ${yearParam} 年度社群`;
+      link.hidden = false;
+    }
+    document.getElementById('regForm').style.display = 'none';
+    document.getElementById('successView').style.display = 'block';
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
 
   // 課程方案欄位：有帶參數就鎖定，否則讓學生自填
   const planField = document.getElementById('planField');
@@ -294,8 +319,7 @@
       if (!response.ok) throw new Error('連線失敗，請稍後重試。');
       const result = await response.json();
       if (result.status !== 'success') throw new Error(result.message || '報名未完成，請重試。');
-      document.getElementById('regForm').style.display = 'none';
-      document.getElementById('successView').style.display = 'block';
+      showRegistrationSuccess();
     } catch (err) {
       errorBanner.textContent = '尚未確認報名成功：' + (err.message || '連線失敗') + ' 已保留填寫內容；若仍無法送出，請聯繫 PACO 老師。';
       errorBanner.style.display = 'block';
