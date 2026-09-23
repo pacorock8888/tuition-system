@@ -123,6 +123,7 @@
     .community-link { display: block; margin-top: 20px; padding: 15px; border-radius: 12px; background: #07883f; color: white; font-size: 16px; font-weight: 600; text-decoration: none; }
     .community-link:hover { background: #066e34; }
     .community-link[hidden] { display: none; }
+    .secondary-btn { display:block; width:100%; margin-top:16px; padding:12px; border:1px solid #d1d1d6; border-radius:10px; background:white; color:#007aff; font:inherit; cursor:pointer; }
 
     footer { text-align: center; margin-top: 20px; font-size: 12px; color: #c7c7cc; }
   </style>
@@ -201,17 +202,20 @@
         </label>
       </section>
 
-      <div id="errorBanner" class="error-banner">送出失敗，請重試或直接聯繫 PACO 老師。</div>
+      <div id="errorBanner" class="error-banner" role="alert">送出失敗，請重試或直接聯繫 PACO 老師。</div>
       <button type="submit" class="submit-btn" id="submitBtn" disabled aria-describedby="submitHint">送出報名</button>
+      <noscript><p>請開啟瀏覽器的 JavaScript，或使用 Chrome／Safari 開啟報名連結。</p></noscript>
       <p id="submitHint" class="submit-hint">請先勾選已閱讀報名須知，再送出報名。</p>
     </form>
 
     <div class="success-view" id="successView">
       <div class="success-icon">✅</div>
-      <h2>報名成功！</h2>
-      <p>PACO 老師已收到您的報名資訊。<br>將盡快透過 LINE 聯繫您確認課程安排。</p>
+      <h2 id="successTitle" tabindex="-1">報名成功！</h2>
+      <p id="successMessage">PACO 老師已收到您的報名資訊。<br>將盡快透過 LINE 聯繫您確認課程安排。</p>
       <p id="communityHint" style="margin-top:16px"></p>
       <a id="communityLink" class="community-link" target="_blank" rel="noopener noreferrer" hidden></a>
+      <p style="margin-top:16px">加入社群遇到問題時，不用重新報名。若 Google 登入不順，請改用 Chrome 或 Safari 開啟社群入口。</p>
+      <button type="button" id="anotherStudent" class="secondary-btn">替另一位學生報名</button>
     </div>
   </div>
 
@@ -227,14 +231,33 @@
   const params = new URLSearchParams(window.location.search);
   const yearParam  = params.get('year')  || '';
   const planParam  = params.get('plan')  || '';
+  // Store only completion status, never names, phone numbers or addresses.
+  const receiptKey = 'paco-registration-receipt-v1:' + JSON.stringify([yearParam, planParam]);
+  const receiptLifetime = 7 * 24 * 60 * 60 * 1000;
+  function readReceipt() {
+    try {
+      const receipt = JSON.parse(localStorage.getItem(receiptKey));
+      const age = receipt && Date.now() - receipt.savedAt;
+      return receipt && Number.isFinite(age) && age >= 0 && age < receiptLifetime ? receipt : null;
+    } catch (_) { return null; }
+  }
+  function rememberSuccess(alreadyRegistered) {
+    try { localStorage.setItem(receiptKey, JSON.stringify({savedAt:Date.now(), alreadyRegistered:!!alreadyRegistered})); }
+    catch (_) { /* Storage restrictions must not block registration. */ }
+  }
 
-  function showRegistrationSuccess() {
+  function showRegistrationSuccess(alreadyRegistered = false, restored = false) {
     const communityUrls = new Map([
       ['116', 'https://pacorock8888.github.io/line-community-link/116/'],
       ['117', 'https://pacorock8888.github.io/line-community-link/117/']
     ]);
     const url = communityUrls.get(yearParam);
     const link = document.getElementById('communityLink');
+    document.getElementById('successTitle').textContent = restored ? '這個瀏覽器已完成報名' : alreadyRegistered ? '已收到您的報名' : '報名成功！';
+    document.getElementById('successMessage').textContent = alreadyRegistered
+      ? '近期已有相同學生與方案的報名，不用再填一次。原報名資料已保留；若要更改資料，請聯繫 PACO 老師。'
+      : restored ? '您先前已送出報名，可以繼續加入班級社群。若是替另一位學生報名，請按下方按鈕。'
+      : 'PACO 老師已收到您的報名資訊，將盡快透過 LINE 聯繫您確認課程安排。';
     document.getElementById('communityHint').textContent = url
       ? '下一步，請加入班級社群，接收課程通知與後續安排。'
       : '請聯繫 PACO 老師取得班級社群連結。';
@@ -245,6 +268,7 @@
     }
     document.getElementById('regForm').style.display = 'none';
     document.getElementById('successView').style.display = 'block';
+    document.getElementById('successTitle').focus();
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
@@ -288,9 +312,47 @@
   const submitBtn = document.getElementById('submitBtn');
   let submitting = false, pendingRegistration = null;
   consent.addEventListener('change', () => {
-    submitBtn.disabled = submitting || !consent.checked;
+    submitBtn.disabled = submitting;
     document.getElementById('submitHint').textContent = consent.checked ? '' : '請先勾選已閱讀報名須知，再送出報名。';
   });
+  function createRegistrationId() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+    if (!window.crypto || typeof window.crypto.getRandomValues !== 'function') {
+      throw new Error('這個瀏覽器無法送出，請改用 Chrome 或 Safari 開啟報名連結。');
+    }
+    const bytes = new Uint8Array(16);
+    window.crypto.getRandomValues(bytes);
+    bytes[6] = (bytes[6] & 15) | 64;
+    bytes[8] = (bytes[8] & 63) | 128;
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function sendRegistration(payload) {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    let timer;
+    try {
+      return await Promise.race([
+        (async () => {
+          const response = await fetch(SCRIPT_URL, {
+            method:'POST', credentials:'omit',
+            headers:{'Content-Type':'text/plain;charset=UTF-8'},
+            body:JSON.stringify(payload), ...(controller ? {signal:controller.signal} : {})
+          });
+          if (!response.ok) throw new Error('連線失敗，請稍後重試。');
+          let result;
+          try { result = await response.json(); }
+          catch (_) { throw new Error('未收到報名確認，請再試一次。'); }
+          if (!result || result.status !== 'success') throw new Error((result && result.message) || '報名未完成，請重試。');
+          return result;
+        })(),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => {
+            reject(new Error('等候回應逾時，請再試一次。'));
+            if (controller) controller.abort();
+          }, 45000);
+        })
+      ]);
+    } finally { clearTimeout(timer); }
+  }
   document.getElementById('regForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     if (submitting) return;
@@ -299,34 +361,42 @@
     const errorBanner = document.getElementById('errorBanner');
     submitting = true; submitBtn.disabled = true; submitBtn.textContent = '送出中…';
     errorBanner.style.display = 'none';
-    const raw = new FormData(this);
-    const payload = { tuition_year: yearParam || '116' };
-    raw.forEach((val, key) => { payload[key] = val.trim ? val.trim() : val; });
-    payload.terms_accepted = true;
-    payload.terms_version = REGISTRATION_TERMS.version;
-    const fingerprint = JSON.stringify(payload);
-    if (!pendingRegistration || pendingRegistration.fingerprint !== fingerprint) {
-      pendingRegistration = {fingerprint, requestId:crypto.randomUUID(), submittedAt:new Date().toISOString()};
-    }
-    payload.registration_id = pendingRegistration.requestId;
-    payload.submitted_at = pendingRegistration.submittedAt;
     try {
-      const response = await fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error('連線失敗，請稍後重試。');
-      const result = await response.json();
-      if (result.status !== 'success') throw new Error(result.message || '報名未完成，請重試。');
-      showRegistrationSuccess();
+      const raw = new FormData(this);
+      const payload = { tuition_year: yearParam || '116' };
+      raw.forEach((val, key) => { payload[key] = val.trim ? val.trim() : val; });
+      payload.terms_accepted = true;
+      payload.terms_version = REGISTRATION_TERMS.version;
+      const fingerprint = JSON.stringify(payload);
+      if (!pendingRegistration || pendingRegistration.fingerprint !== fingerprint) {
+        pendingRegistration = {fingerprint, requestId:createRegistrationId(), submittedAt:new Date().toISOString()};
+      }
+      payload.registration_id = pendingRegistration.requestId;
+      payload.submitted_at = pendingRegistration.submittedAt;
+      const result = await sendRegistration(payload);
+      rememberSuccess(result.already_registered);
+      showRegistrationSuccess(result.already_registered);
     } catch (err) {
-      errorBanner.textContent = '尚未確認報名成功：' + (err.message || '連線失敗') + ' 已保留填寫內容；若仍無法送出，請聯繫 PACO 老師。';
+      errorBanner.textContent = '尚未確認報名成功：' + (err.message || '連線失敗') + ' 填寫內容仍保留在此頁，可以再按一次送出，系統會檢查是否重複報名。若仍無法送出，請聯繫 PACO 老師，不必一直重新填寫。';
       errorBanner.style.display = 'block';
     } finally {
-      submitting = false; submitBtn.disabled = !consent.checked; submitBtn.textContent = '送出報名';
+      submitting = false; submitBtn.disabled = false; submitBtn.textContent = '送出報名';
     }
   });
+  document.getElementById('anotherStudent').addEventListener('click', () => {
+    try { localStorage.removeItem(receiptKey); } catch (_) {}
+    pendingRegistration = null;
+    const form = document.getElementById('regForm');
+    form.reset();
+    document.getElementById('errorBanner').style.display = 'none';
+    document.getElementById('submitHint').textContent = '請先勾選已閱讀報名須知，再送出報名。';
+    document.getElementById('successView').style.display = 'none';
+    form.style.display = 'block';
+    form.elements.student_name.focus();
+  });
+  const savedReceipt = readReceipt();
+  if (savedReceipt) showRegistrationSuccess(savedReceipt.alreadyRegistered, true);
+  submitBtn.disabled = false;
 </script>
 
 </body>
