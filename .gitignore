@@ -1,0 +1,9 @@
+# Local data exports and credentials. Do not commit student data or secrets.
+*.xlsx
+*.csv
+data-exports/
+exports/
+backups/
+.env*
+.dev.vars
+.clasp.json
