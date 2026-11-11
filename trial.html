@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>巨石玩理｜試聽資料填寫</title>
+<style>
+:root{color-scheme:light;--ink:#1b2838;--muted:#596675;--accent:#174e67;--line:#d8e0e5;--error:#a4232e}*{box-sizing:border-box}body{margin:0;background:#f2f5f7;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","Microsoft JhengHei",sans-serif;line-height:1.65}main{max-width:720px;margin:32px auto;padding:0 18px}header{padding:22px 4px}h1{font-size:28px;margin:3px 0 12px;letter-spacing:.02em}header p{margin:4px 0;color:var(--muted)}.brand{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:.12em}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:0 8px 32px #17324808}.field{margin-bottom:24px}label,.legend{display:block;font-weight:650;margin-bottom:7px}.req{color:var(--error)}input:not([type=checkbox]),select,textarea{display:block;width:100%;font:inherit;font-size:16px;color:var(--ink);padding:11px 12px;border:1px solid #adbcc6;border-radius:8px;background:white;min-height:46px}textarea{min-height:100px;resize:vertical}input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #5aa9d0;outline-offset:3px}input:disabled{background:#edf1f4;color:#7a8792}.hint{font-size:14px;color:var(--muted);margin:6px 0 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:20px}.check{display:flex;align-items:flex-start;gap:10px;font-weight:500;padding:10px 0;cursor:pointer;min-height:44px}.check input{margin:5px 0 0;width:20px;height:20px;flex:0 0 20px}.terms{white-space:pre-wrap;overflow-wrap:anywhere;background:#f5f7f8;border:1px solid var(--line);padding:16px;border-radius:10px;font-size:15px;line-height:1.8}.error{color:var(--error);background:#fff2f3;border:1px solid #e6afb5;padding:12px;border-radius:8px;margin:18px 0;overflow-wrap:anywhere}.error:empty{display:none}button{font:inherit;font-weight:650;border:0;border-radius:10px;padding:13px 20px;min-height:48px;cursor:pointer;background:var(--accent);color:white}button:disabled{opacity:.55;cursor:wait}.submit{width:100%}.success h2{color:#22634b;margin-top:0}.success p{margin:10px 0}.secondary{margin-top:16px;background:#eaf0f3;color:var(--accent)}footer{font-size:13px;color:var(--muted);padding:22px 4px} [hidden]{display:none!important}@media(max-width:480px){main{margin:10px auto;padding:0 12px}.card{padding:20px 16px}.row{grid-template-columns:1fr;gap:0}h1{font-size:25px}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand">巨石玩理 · PACO 老師</div><h1>試聽資料填寫</h1><p>請先透過 LINE 與老師約好日期，再填寫這份資料。</p><p>有 <span class="req">*</span> 的項目為必填。</p></header>
+<noscript><p class="error">此表單需要啟用 JavaScript 才能安全送出。請開啟後重新整理，或透過 LINE 聯絡老師。</p></noscript>
+<form id="trialForm" class="card" action="about:blank" method="post" novalidate>
+<fieldset id="formFields" disabled style="border:0;padding:0;margin:0;min-width:0">
+<div class="field"><label for="student_name">學生姓名 <span class="req">*</span></label><input id="student_name" name="student_name" maxlength="80" autocomplete="name" required></div>
+<div class="field"><label for="respondent">填表人 <span class="req">*</span></label><select id="respondent" name="respondent" required><option value="">請選擇</option><option>學生本人</option><option>家長</option></select></div>
+<div class="field"><label for="line_display_name">LINE 顯示名稱 <span class="req">*</span></label><input id="line_display_name" name="line_display_name" maxlength="100" required aria-describedby="lineHint"><p id="lineHint" class="hint">請填寫與老師聯絡時顯示的名稱，方便老師確認身分。</p></div>
+<div class="field"><label for="school">就讀學校 <span class="req">*</span></label><input id="school" name="school" maxlength="120" required></div>
+<div class="row"><div class="field"><label for="grade">年級 <span class="req">*</span></label><select id="grade" name="grade" required><option value="">請選擇</option><option>國二</option><option>國三</option></select></div><div class="field"><label for="trial_date">已約好的試聽日期 <span class="req">*</span></label><input type="date" id="trial_date" name="trial_date" required aria-describedby="dateHint"><p id="dateHint" class="hint">請依 LINE 已約好的日期填寫，這不是自動預約。</p></div></div>
+<div class="field"><label for="tutoring">目前有補理化嗎 <span class="req">*</span></label><select id="tutoring" name="tutoring" required><option value="">請選擇</option><option>有</option><option>沒有</option></select></div>
+<div class="field"><label for="score">最近一次理化段考成績 <span class="req">*</span></label><input type="number" id="score" name="score" min="0" max="100" step="0.1" inputmode="decimal" required aria-describedby="scoreHint"><label class="check" for="no_score"><input type="checkbox" id="no_score" name="no_score">尚無成績</label><p id="scoreHint" class="hint">填寫 0～100 分；若目前沒有成績，請勾選「尚無成績」。</p></div>
+<div class="field"><label for="source">從哪裡知道 Paco 老師 <span class="req">*</span></label><select id="source" name="source" required><option value="">請選擇</option><option>IG</option><option>FB</option><option>YT</option><option>TikTok</option><option>Threads</option><option>親友介紹</option><option>其他</option></select><div id="sourceOtherWrap" hidden><label for="source_other" class="hint">其他管道（選填）</label><input id="source_other" name="source_other" maxlength="200"></div></div>
+<div class="field"><div class="legend">上課須知 <span class="req">*</span></div><div id="termsText" class="terms"></div><label class="check" for="terms_accepted"><input type="checkbox" id="terms_accepted" name="terms_accepted" required><span id="termsAcknowledgement"></span></label></div>
+<div class="field"><label for="learning_question">目前學習理化遇到什麼問題？（選填）</label><textarea id="learning_question" name="learning_question" maxlength="2000"></textarea></div>
+<p class="hint">填寫內容供老師安排與追蹤試聽使用，不會公開給其他填表人。送出不代表正式報名。</p>
+</fieldset>
+<p id="formError" class="error" role="alert" tabindex="-1"></p>
+<button id="submitButton" class="submit" type="submit" disabled>送出試聽資料</button>
+</form>
+<section id="successPanel" class="card success" hidden tabindex="-1" aria-labelledby="successTitle"><h2 id="successTitle">已收到你的試聽資料</h2><p>請透過 LINE 與老師確認試聽安排。這次送出不是正式報名，也不代表已自動預約成功。</p><p>上課連結將由老師另外提供。</p><button id="newStudentButton" class="secondary" type="button">替另一位學生填寫</button></section>
+<footer>巨石玩理｜試聽資料</footer>
+</main>
+<script>
+'use strict';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw7D_7xj3xe3S_ejL58oOGO2AMc70gMXBAtgbnkmrKqsPL3KxMaz9IlyFk6jMPyBjKRmQ/exec';
+const TRIAL_TERMS = {"version": "2026-11-11-v1", "text": "上課須知\n\n1. paco老師的線上課程是『高互動』進行，希望來試聽的 \n   同學也必須跟我互動，我相信這樣你的收穫絕對會比你\n 『純聽』效果來得更好，回答問題不用害怕答錯，你盡可\n  能地發揮，我的班級絕對不會出現也不允許有人嘲笑別人\n\n2. 第一次來試聽的同學請把重點放在『喜不喜歡上課的方\n    式』，不是放在『聽不聽得懂』，可能你是中途來的，有\n    些內容聽不懂是正常的，後續paco老師會跟您討論解決 \n    方式\n\n3. 上課用zoom平台上課，請上課前先自行下載\n    https://zoom.us/zh-tw/download\n\n4. 上課前 15 分鐘會提供上課連結\n\n5. 上課禁止錄影，違者將保留法律追訴權\n\n", "acknowledgement": "我認同，會參與其中"};
+const form = document.getElementById('trialForm');
+const fields = document.getElementById('formFields');
+const submitButton = document.getElementById('submitButton');
+const errorBox = document.getElementById('formError');
+const successPanel = document.getElementById('successPanel');
+let requestId = '';
+let pendingPayload = null;
+let pendingHash = '';
+const REQUEST_STORAGE_KEY = 'paco-trial-request-v1';
+let busy = false;
+let generation = 0;
+function newRequestId() {
+  if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID();
+  if (!globalThis.crypto || typeof globalThis.crypto.getRandomValues !== 'function') throw new Error('瀏覽器無法建立安全送出編號，請換用較新的瀏覽器。');
+  const a = new Uint8Array(16); globalThis.crypto.getRandomValues(a); a[6] = (a[6] & 15) | 64; a[8] = (a[8] & 63) | 128;
+  return Array.from(a, (v,i) => ([4,6,8,10].includes(i) ? '-' : '') + v.toString(16).padStart(2,'0')).join('');
+}
+function saveRequestState(state) {
+  const serialized = JSON.stringify(state);
+  sessionStorage.setItem(REQUEST_STORAGE_KEY, serialized);
+  if(sessionStorage.getItem(REQUEST_STORAGE_KEY)!==serialized) throw new Error('瀏覽器無法保留防重複送出編號，尚未開始這次送出。請換用瀏覽器或透過 LINE 聯絡老師。');
+}
+function clearRequestState() {
+  sessionStorage.removeItem(REQUEST_STORAGE_KEY);
+  if(sessionStorage.getItem(REQUEST_STORAGE_KEY)!==null) throw new Error('無法重設填寫狀態，請透過 LINE 聯絡老師。');
+}
+async function payloadHash(body) {
+  if(!globalThis.crypto?.subtle) throw new Error('瀏覽器無法建立安全重試資訊，尚未送出。請換用較新的瀏覽器。');
+  const digest = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(body)));
+  return Array.from(new Uint8Array(digest),n=>n.toString(16).padStart(2,'0')).join('');
+}
+function text(id) { return document.getElementById(id).value.trim(); }
+function syncConditionalFields() {
+  const noScore = document.getElementById('no_score').checked;
+  document.getElementById('score').disabled = noScore;
+  document.getElementById('score').required = !noScore;
+  document.getElementById('sourceOtherWrap').hidden = text('source') !== '其他';
+}
+function payload() {
+  const noScore = document.getElementById('no_score').checked;
+  return {form_type:'trial', request_id:requestId, student_name:text('student_name'), respondent:text('respondent'), line_display_name:text('line_display_name'), school:text('school'), grade:text('grade'), trial_date:text('trial_date'), tutoring:text('tutoring'), score:noScore?null:Number(text('score')), no_score:noScore, source:text('source'), source_other:text('source')==='其他'?text('source_other'):'', terms_accepted:document.getElementById('terms_accepted').checked, terms_version:TRIAL_TERMS.version, learning_question:text('learning_question')};
+}
+function showError(message) { errorBox.textContent = message; errorBox.focus(); }
+async function sendPayload(body) {
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  let timer;
+  try {
+    return await Promise.race([
+      (async () => {const response = await fetch(SCRIPT_URL, {method:'POST',mode:'cors',credentials:'omit',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),...(controller?{signal:controller.signal}:{})});if(!response.ok) throw new Error('伺服器暫時無法回應');return await response.json();})(),
+      new Promise((_, reject) => {timer = setTimeout(() => { if(controller) controller.abort(); reject(new Error('確認送出結果逾時')); },45000);})
+    ]);
+  } finally {clearTimeout(timer);}
+}
+form.addEventListener('submit', async event => {
+  event.preventDefault(); if(busy) return;
+  errorBox.textContent = '';
+  syncConditionalFields();
+  if(!form.reportValidity()) return;
+  if(['student_name','line_display_name','school'].some(id=>!text(id))) {showError('姓名、LINE 顯示名稱和學校不能只填空白。');return;}
+  let body;
+  try {if(!requestId) requestId=newRequestId();body=payload();}
+  catch(error) {showError(error.message);return;}
+  if(pendingPayload && JSON.stringify(body)!==JSON.stringify(pendingPayload)) {
+    showError('上一次送出結果尚未確認，請先還原填寫內容再重試，或透過 LINE 請老師確認，避免重複申請。');return;
+  }
+  busy=true;const mine=++generation;fields.disabled=true;submitButton.disabled=true;submitButton.textContent='正在送出…';
+  try {
+    const hash = await payloadHash(body);
+    if(pendingHash && pendingHash!==hash) throw new Error('上一次送出結果尚未確認，請按原資料重填，或透過 LINE 請老師核對。');
+    // Store only an opaque request ID and a hash, never names, school, scores or form text.
+    try { saveRequestState({id:requestId,hash,state:'pending'}); }
+    catch(error) { throw new Error('瀏覽器無法保留防重複送出編號，尚未開始這次送出。請換用瀏覽器或透過 LINE 聯絡老師。'); }
+    pendingHash=hash;pendingPayload=body;
+    const result = await sendPayload(body);
+    if(mine!==generation) return;
+    if(!result || result.status!=='success') {
+      // Only explicit validation-before-write refusal permits editing a new request.
+      if (result && result.saved === false) { clearRequestState();pendingPayload = null;pendingHash='';requestId = ''; }
+      throw new Error(result && typeof result.message==='string' ? result.message : '未收到明確的成功確認');
+    }
+    // If updating this marker fails, the stored pending ID still makes a reload safe.
+    try {saveRequestState({id:requestId,hash:pendingHash,state:'success'});} catch(error) {}
+    form.hidden=true;successPanel.hidden=false;successPanel.focus();
+  } catch(error) {
+    if(mine!==generation) return;
+    showError((error && typeof error.message==='string'?error.message:'暫時無法確認送出結果')+(pendingPayload||pendingHash?'。內容已保留，可按原資料重試；若需更改，請先用 LINE 聯絡老師確認是否收到。':'。內容已保留，請修正後再送出。'));
+  } finally {
+    if(mine===generation) {busy=false;fields.disabled=false;syncConditionalFields();submitButton.disabled=false;submitButton.textContent='送出試聽資料';}
+  }
+});
+document.getElementById('no_score').addEventListener('change',syncConditionalFields);
+document.getElementById('source').addEventListener('change',syncConditionalFields);
+document.getElementById('newStudentButton').addEventListener('click',()=>{if(busy)return;try{clearRequestState();}catch(error){successPanel.hidden=true;form.hidden=false;fields.disabled=true;submitButton.disabled=true;showError(error.message);return;}generation++;form.reset();requestId='';pendingPayload=null;pendingHash='';errorBox.textContent='';successPanel.hidden=true;form.hidden=false;syncConditionalFields();document.getElementById('student_name').focus();});
+window.addEventListener('beforeunload',event=>{if(busy||((pendingPayload||pendingHash)&&successPanel.hidden)){event.preventDefault();event.returnValue='';}});
+try {
+  document.getElementById('termsText').textContent=TRIAL_TERMS.text;
+  document.getElementById('termsAcknowledgement').textContent=TRIAL_TERMS.acknowledgement;
+  const saved = sessionStorage.getItem(REQUEST_STORAGE_KEY);
+  if(saved) {
+    const state=JSON.parse(saved);
+    if(!state||!/^[A-Za-z0-9_-]{10,80}$/.test(state.id)||!/^[a-f0-9]{64}$/.test(state.hash)||!['pending','success'].includes(state.state)) throw new Error('無法確認上次送出狀態');
+    requestId=state.id;pendingHash=state.hash;
+    if(state.state==='success'){form.hidden=true;successPanel.hidden=false;}
+    else showError('上次送出結果尚未確認。請依原內容重填再重試，或透過 LINE 請老師核對；請勿另開分頁重複填寫。');
+  } else requestId=newRequestId();
+  fields.disabled=false;syncConditionalFields();submitButton.disabled=false;
+} catch(error) {showError('無法安全確認填寫狀態，尚未送出。請透過 LINE 聯絡老師，或換用可保留分頁資料的瀏覽器。');}
+</script>
+</body>
+</html>
