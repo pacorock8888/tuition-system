@@ -16,8 +16,6 @@
 <form id="trialForm" class="card" action="about:blank" method="post" novalidate>
 <fieldset id="formFields" disabled style="border:0;padding:0;margin:0;min-width:0">
 <div class="field"><label for="student_name">學生姓名 <span class="req">*</span></label><input id="student_name" name="student_name" maxlength="80" autocomplete="name" required></div>
-<div class="field"><label for="respondent">填表人 <span class="req">*</span></label><select id="respondent" name="respondent" required><option value="">請選擇</option><option>學生本人</option><option>家長</option></select></div>
-<div class="field"><label for="line_display_name">LINE 顯示名稱 <span class="req">*</span></label><input id="line_display_name" name="line_display_name" maxlength="100" required aria-describedby="lineHint"><p id="lineHint" class="hint">請填寫與老師聯絡時顯示的名稱，方便老師確認身分。</p></div>
 <div class="field"><label for="school">就讀學校 <span class="req">*</span></label><input id="school" name="school" maxlength="120" required></div>
 <div class="row"><div class="field"><label for="grade">年級 <span class="req">*</span></label><select id="grade" name="grade" required><option value="">請選擇</option><option>國二</option><option>國三</option></select></div><div class="field"><label for="trial_date">已約好的試聽日期 <span class="req">*</span></label><input type="date" id="trial_date" name="trial_date" required aria-describedby="dateHint"><p id="dateHint" class="hint">請依 LINE 已約好的日期填寫，這不是自動預約。</p></div></div>
 <div class="field"><label for="tutoring">目前有補理化嗎 <span class="req">*</span></label><select id="tutoring" name="tutoring" required><option value="">請選擇</option><option>有</option><option>沒有</option></select></div>
@@ -77,7 +75,7 @@ function syncConditionalFields() {
 }
 function payload() {
   const noScore = document.getElementById('no_score').checked;
-  return {form_type:'trial', request_id:requestId, student_name:text('student_name'), respondent:text('respondent'), line_display_name:text('line_display_name'), school:text('school'), grade:text('grade'), trial_date:text('trial_date'), tutoring:text('tutoring'), score:noScore?null:Number(text('score')), no_score:noScore, source:text('source'), source_other:text('source')==='其他'?text('source_other'):'', terms_accepted:document.getElementById('terms_accepted').checked, terms_version:TRIAL_TERMS.version, learning_question:text('learning_question')};
+  return {form_type:'trial', request_id:requestId, student_name:text('student_name'), school:text('school'), grade:text('grade'), trial_date:text('trial_date'), tutoring:text('tutoring'), score:noScore?null:Number(text('score')), no_score:noScore, source:text('source'), source_other:text('source')==='其他'?text('source_other'):'', terms_accepted:document.getElementById('terms_accepted').checked, terms_version:TRIAL_TERMS.version, learning_question:text('learning_question')};
 }
 function showError(message) { errorBox.textContent = message; errorBox.focus(); }
 async function sendPayload(body) {
@@ -95,7 +93,7 @@ form.addEventListener('submit', async event => {
   errorBox.textContent = '';
   syncConditionalFields();
   if(!form.reportValidity()) return;
-  if(['student_name','line_display_name','school'].some(id=>!text(id))) {showError('姓名、LINE 顯示名稱和學校不能只填空白。');return;}
+  if(['student_name','school'].some(id=>!text(id))) {showError('學生姓名和學校不能只填空白。');return;}
   let body;
   try {if(!requestId) requestId=newRequestId();body=payload();}
   catch(error) {showError(error.message);return;}
